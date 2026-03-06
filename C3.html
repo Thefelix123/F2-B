@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>C3 F2!!</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinemática Espacial - F2</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        /* Animations & Utilities */
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+        .draw-path { stroke-dasharray: 2000; stroke-dashoffset: 2000; transition: stroke-dashoffset 2s ease-in-out; }
+        .drawn { stroke-dashoffset: 0 !important; }
+        
+        .shadow-text {
+            text-shadow: 4px 4px 0px #fff, -4px -4px 0px #fff, 4px -4px 0px #fff, -4px 4px 0px #fff, 0px 4px 0px #fff, 0px -4px 0px #fff, 4px 0px 0px #fff, -4px 0px 0px #fff;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.03] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="route" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="map-pin" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Cinemática Vectorial
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    Posición, Trayectoria y Desplazamiento
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="navigation" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">El Camino vs. El Cambio Real</h2>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-10 flex-1 min-h-[500px] items-stretch">
+                <div class="col-span-5 flex flex-col space-y-6 justify-center">
+                    <p class="text-2xl text-slate-700 leading-relaxed font-medium">
+                        Consideremos el vuelo de una abeja. Parte de una flor y vuela en una ruta curva buscando polen, hasta detenerse en otra flor.
+                    </p>
+                    <div class="glass-card p-8 flex flex-col gap-4 border-l-8 border-rose-500 shadow-md">
+                        <p class="text-2xl text-slate-800 font-extrabold flex items-center gap-3">
+                            <i data-lucide="bug" class="text-rose-600 w-8 h-8"></i> El Conflicto Físico
+                        </p>
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            La abeja gastó energía volando una longitud total de $50\text{ m}$. Sin embargo, al terminar, se encuentra apenas a $10\text{ m}$ de distancia de su flor de origen.
+                            <br><br>
+                            ¿Cómo diferenciamos matemáticamente el <em>"esfuerzo del recorrido"</em> respecto a la <em>"efectividad de su avance espacial"</em>?
+                        </p>
+                    </div>
+
+                    <div class="relative w-full h-24 mt-4">
+                        <button onclick="
+                            this.classList.add('opacity-0', 'pointer-events-none'); 
+                            document.getElementById('gancho-res').classList.add('visible');
+                            document.getElementById('gancho-trayectoria').classList.add('visible');
+                            setTimeout(() => {
+                                document.getElementById('gancho-desp').classList.add('visible');
+                            }, 600);"
+                            class="absolute inset-0 px-6 py-5 bg-indigo-800 text-white rounded-xl text-2xl font-bold hover:bg-indigo-900 transition-all duration-300 shadow-lg flex items-center justify-center gap-3 w-full h-full z-20">
+                            <i data-lucide="scan-line"></i> Analizar Movimiento
+                        </button>
+
+                        <div id="gancho-res" class="fade-in absolute inset-0 bg-slate-50 p-6 rounded-xl border-l-8 border-indigo-500 text-lg font-medium text-slate-800 shadow-sm flex items-center h-full z-10">
+                            El camino real (Distancia) es un escalar. El avance directo requiere un vector (Desplazamiento) para indicar la dirección y sentido final.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-span-7 glass-card border-4 border-slate-200 p-6 flex items-center justify-center shadow-xl relative overflow-hidden h-full w-full bg-white">
+                    <svg viewBox="0 0 500 400" class="w-full h-full overflow-visible">
+                        <g stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4,4">
+                            <line x1="0" y1="100" x2="500" y2="100"/><line x1="0" y1="200" x2="500" y2="200"/><line x1="0" y1="300" x2="500" y2="300"/>
+                            <line x1="100" y1="0" x2="100" y2="400"/><line x1="200" y1="0" x2="200" y2="400"/><line x1="300" y1="0" x2="300" y2="400"/><line x1="400" y1="0" x2="400" y2="400"/>
+                        </g>
+
+                        <g id="gancho-trayectoria" class="fade-in">
+                            <path d="M 100 300 C 50 150, 250 400, 300 200 C 350 0, 450 250, 400 100" fill="none" stroke="#94a3b8" stroke-width="5" stroke-dasharray="8,6"/>
+                            <text x="180" y="340" font-size="22" font-weight="bold" fill="#64748b" class="shadow-text">Camino: 50 m</text>
+                        </g>
+
+                        <circle cx="100" cy="300" r="8" fill="#f59e0b"/>
+                        <text x="30" y="306" font-size="24" font-weight="bold" fill="#d97706" class="shadow-text">Inicio</text>
+                        
+                        <circle cx="400" cy="100" r="8" fill="#ec4899"/>
+                        <text x="415" y="106" font-size="24" font-weight="bold" fill="#be185d" class="shadow-text">Fin</text>
+
+                        <g id="gancho-desp" class="fade-in">
+                            <path d="M 100 300 L 400 100" fill="none" stroke="#10b981" stroke-width="8" marker-end="url(#arrowG)"/>
+                            <text x="250" y="180" fill="#059669" font-size="26" font-weight="extrabold" text-anchor="middle" class="shadow-text">Avance Directo: 10 m</text>
+                        </g>
+
+                        <defs>
+                            <marker id="arrowG" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#10b981" /></marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="crosshair" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">El Vector Posición ($\vec{r}$)</h2>
+            </div>
+            
+            <p class="text-2xl text-slate-700 font-medium mb-8 bg-white p-6 border border-slate-200 rounded-2xl shadow-sm text-center">
+                Para estudiar cinemática, primero debemos ubicar al objeto. El <strong>Vector Posición</strong> nace estrictamente en el origen $(0,0)$ y su punta <strong>persigue y señala</strong> la coordenada exacta de la partícula.
+            </p>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 min-h-[450px]">
+                <div class="col-span-5 flex flex-col space-y-6 justify-center">
+                    <div class="glass-card p-8 border-l-8 border-indigo-500 shadow-md bg-white">
+                        <p class="text-2xl font-extrabold text-slate-900 mb-4 flex items-center gap-2">Dependencia Temporal</p>
+                        <p class="text-xl text-slate-600 font-medium mb-6 leading-relaxed">A medida que el tiempo ($t$) transcurre, el objeto se mueve. Esto obliga al vector a modificar su módulo y dirección de forma continua.</p>
+                        <div class="bg-indigo-50 p-4 rounded-xl font-mono text-4xl text-center text-indigo-900 font-black shadow-inner border border-indigo-200">
+                            $$ \vec{r}(t) = (x(t), y(t)) $$
+                        </div>
+                    </div>
+
+                    <button onclick="startPositionAnimation()" class="px-8 py-5 bg-indigo-900 text-white rounded-2xl text-2xl font-bold shadow-xl flex items-center justify-center gap-3 hover:bg-slate-800 transition">
+                        <i data-lucide="play-circle"></i> Iniciar Movimiento $\vec{r}(t)$
+                    </button>
+                </div>
+
+                <div class="col-span-7 glass-card p-6 border-4 border-slate-200 shadow-lg bg-white relative overflow-hidden w-full h-full flex items-center justify-center">
+                    <svg viewBox="-50 -50 500 500" class="w-full h-full overflow-visible">
+                        <g stroke="#e2e8f0" stroke-width="2">
+                            <line x1="0" y1="100" x2="400" y2="100"/><line x1="0" y1="200" x2="400" y2="200"/><line x1="0" y1="300" x2="400" y2="300"/>
+                            <line x1="100" y1="0" x2="100" y2="400"/><line x1="200" y1="0" x2="200" y2="400"/><line x1="300" y1="0" x2="300" y2="400"/>
+                        </g>
+
+                        <line x1="-30" y1="400" x2="450" y2="400" stroke="#94a3b8" stroke-width="4"/>
+                        <line x1="0" y1="430" x2="0" y2="-30" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="430" y="435" font-size="20" font-weight="bold" fill="#64748b" class="shadow-text">X (m)</text>
+                        <text x="-40" y="-10" font-size="20" font-weight="bold" fill="#64748b" class="shadow-text">Y (m)</text>
+                        <text x="-25" y="425" font-size="18" font-weight="bold" fill="#64748b" class="shadow-text">0</text>
+
+                        <path id="anim-r-path" d="M 0 400" fill="none" stroke="#cbd5e1" stroke-width="5" stroke-dasharray="8,6"/>
+                        
+                        <path id="anim-r-vector" d="M 0 400 L 0 400" fill="none" stroke="#3b82f6" stroke-width="6" marker-end="url(#arrowBlueR)"/>
+                        
+                        <text id="anim-r-label" x="-100" y="-100" font-size="32" font-weight="bold" fill="#2563eb" class="shadow-text" font-family="monospace">$\vec{r}$</text>
+                        <circle id="anim-r-dot" cx="0" cy="400" r="10" fill="#e11d48"/>
+                        
+                        <rect x="220" y="0" width="220" height="90" fill="rgba(255,255,255,0.9)" stroke="#94a3b8" stroke-width="2" rx="8"/>
+                        <text id="anim-r-time" x="240" y="35" font-size="22" font-family="monospace" font-weight="bold" fill="#334155">t = 0.0 s</text>
+                        <text id="anim-r-coord" x="240" y="70" font-size="22" font-family="monospace" font-weight="bold" fill="#1e40af">r = (0.0, 0.0)</text>
+
+                        <defs>
+                            <marker id="arrowBlueR" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#3b82f6" /></marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="trending-up" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Trayectoria, Distancia y Poligonal</h2>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-10 flex-1 min-h-[500px]">
+                <div class="col-span-4 flex flex-col justify-start space-y-6">
+                    <div class="glass-card p-6 border-l-8 border-amber-500 shadow-sm bg-slate-50">
+                        <p class="text-xl text-slate-800 font-bold mb-2">Trayectoria y Distancia ($d$)</p>
+                        <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                            La trayectoria es la huella curva. La <strong>distancia ($d$)</strong> es un escalar puro que mide la longitud total del camino.
+                        </p>
+                    </div>
+                    <div class="glass-card p-6 border-l-8 border-emerald-500 shadow-md bg-white">
+                        <p class="text-xl text-slate-800 font-bold mb-2">Desplazamiento ($\Delta\vec{r}$)</p>
+                        <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                            Vector recto desde $\vec{r}_i$ hasta $\vec{r}_f$. Registra exclusivamente el cambio posicional neto.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="col-span-8 flex flex-col h-full gap-4">
+                    <div class="glass-card p-6 flex items-center justify-center bg-white border-4 border-slate-200 shadow-lg overflow-hidden relative h-[65%] w-full">
+                        <svg viewBox="50 50 400 250" class="w-full h-full overflow-visible">
+                            <circle cx="100" cy="200" r="8" fill="#1e293b"/>
+                            <text x="50" y="235" font-size="22" font-weight="bold" fill="#0f172a" class="shadow-text">A ($\vec{r}_i$)</text>
+
+                            <circle cx="400" cy="200" r="8" fill="#1e293b"/>
+                            <text x="390" y="235" font-size="22" font-weight="bold" fill="#0f172a" class="shadow-text">B ($\vec{r}_f$)</text>
+
+                            <path d="M 100 200 C 150 50, 300 350, 400 200" fill="none" stroke="#f59e0b" stroke-width="6" stroke-dasharray="8,6"/>
+                            <text x="250" y="90" font-size="22" font-weight="bold" fill="#d97706" class="shadow-text">Trayectoria (Curva)</text>
+
+                            <g id="seq-desp" class="fade-in">
+                                <path d="M 100 200 L 400 200" fill="none" stroke="#10b981" stroke-width="8" marker-end="url(#arrGrn)"/>
+                                <text x="230" y="185" font-weight="extrabold" font-size="24" fill="#059669" class="shadow-text">$\Delta\vec{r}$</text>
+                            </g>
+
+                            <g id="seq-poli" class="fade-in">
+                                <path d="M 100 200 L 151 164" fill="none" stroke="#3b82f6" stroke-width="5" marker-end="url(#arrBlu)"/>
+                                <path d="M 151 164 L 234 184" fill="none" stroke="#3b82f6" stroke-width="5" marker-end="url(#arrBlu)"/>
+                                <path d="M 234 184 L 321 228" fill="none" stroke="#3b82f6" stroke-width="5" marker-end="url(#arrBlu)"/>
+                                <path d="M 321 228 L 400 200" fill="none" stroke="#3b82f6" stroke-width="5" marker-end="url(#arrBlu)"/>
+                                <text x="230" y="240" font-weight="bold" font-size="22" fill="#2563eb" class="shadow-text">$\Delta\vec{r}_i$</text>
+                            </g>
+
+                            <defs>
+                                <marker id="arrGrn" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#10b981" /></marker>
+                                <marker id="arrBlu" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#3b82f6" /></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div class="relative w-full h-[30%] mt-2">
+                        <button id="btn-poligonal" onclick="animarSecuenciaPoligonal()" class="absolute inset-0 px-6 py-4 bg-indigo-800 text-white rounded-xl text-2xl font-bold hover:bg-indigo-900 transition shadow-lg flex items-center justify-center gap-3 z-20">
+                            <i data-lucide="layers"></i> Paso 1: Trazar Desplazamiento
+                        </button>
+
+                        <div id="form-poligonal" class="absolute inset-0 fade-in bg-slate-900 p-4 rounded-2xl border border-slate-700 shadow-inner z-10 flex flex-col items-center justify-center">
+                            <p class="text-slate-300 text-base font-bold uppercase tracking-widest text-center mb-1">Cálculo Geométrico</p>
+                            <p class="text-slate-400 text-base text-center mb-2 leading-tight">Matemáticamente, la longitud escalar de la distancia ($d$) se aproxima sumando los módulos de todos los vectores de desplazamiento diminutos a lo largo de la curva:</p>
+                            <div class="font-mono text-3xl text-center text-amber-400 font-bold">
+                                $$ d \approx \sum \|\Delta\vec{r}_i\| $$
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-6 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="cpu" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Ecuación de Cambio Vectorial</h2>
+            </div>
+
+            <p class="text-2xl text-slate-700 font-medium mb-8 bg-white p-6 border border-slate-200 rounded-2xl shadow-sm text-center">
+                El triángulo espacial formado por el origen y las dos posiciones (inicial y final) se resuelve algebraicamente mediante la sustracción de vectores.
+            </p>
+
+            <div class="grid grid-cols-2 gap-12 flex-1 items-stretch">
+                <div class="glass-card p-10 flex flex-col justify-center text-center border-l-8 border-indigo-600 shadow-xl bg-white h-full">
+                    <p class="text-2xl font-bold text-slate-500 uppercase tracking-widest mb-6">Vector Desplazamiento</p>
+                    <div class="bg-indigo-50 p-6 rounded-3xl font-mono text-[4rem] text-indigo-900 font-black shadow-inner border border-indigo-200">
+                        $$ \Delta\vec{r} = \vec{r}_f - \vec{r}_i $$
+                    </div>
+                    <p class="text-xl text-slate-700 mt-8 font-medium text-justify px-6 leading-relaxed">
+                        Para calcular cuánto y hacia dónde se desplazó netamente un objeto, restamos analíticamente la coordenada inicial a la coordenada final, componente a componente.
+                    </p>
+                </div>
+
+                <div class="glass-card p-10 border-t-8 border-emerald-500 shadow-xl bg-slate-900 flex flex-col justify-center h-full">
+                    <p class="text-3xl font-extrabold text-white mb-8 text-center border-b border-slate-700 pb-4">La Trampa Conceptual PAES</p>
+                    <div class="space-y-6">
+                        <div class="bg-slate-800 p-6 rounded-2xl border-l-4 border-amber-500">
+                            <p class="text-amber-400 font-bold text-xl mb-2">Distancia ($d$)</p>
+                            <p class="text-slate-300 text-lg leading-relaxed">Escalar que suma la longitud geométrica total del trayecto. <strong>Nunca es cero</strong> si existió movimiento físico.</p>
+                        </div>
+                        <div class="bg-slate-800 p-6 rounded-2xl border-l-4 border-emerald-500">
+                            <p class="text-emerald-400 font-bold text-xl mb-2">Módulo del Desplazamiento ($||\Delta\vec{r}||$)</p>
+                            <p class="text-slate-300 text-lg leading-relaxed">Longitud de la flecha recta (Avance Neto). <strong>Puede ser cero</strong> si el objeto termina exactamente donde inició el movimiento.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="calculator" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Aplicación Analítica en Plano</h2>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-10 flex-1 h-full items-stretch">
+                <div class="col-span-5 glass-card bg-slate-50 shadow-lg flex flex-col h-full border-2 border-slate-200 overflow-hidden">
+                    <div class="p-6 shrink-0">
+                        <p class="text-xl font-medium text-slate-800 leading-relaxed border-l-8 border-indigo-400 pl-6 py-4 bg-white rounded-r-xl shadow-sm text-justify">
+                            Un robot parte de la posición inicial $\mathbf{\vec{r}_i = (2, 2)\text{ m}}$. Se mueve en línea recta hacia la derecha hasta la coordenada $(6, 2)$ y luego sube verticalmente directo hasta su posición final $\mathbf{\vec{r}_f = (6, 5)\text{ m}}$.
+                            <br><br>Determine analíticamente la <strong>distancia total ($d$)</strong> y formule el cálculo del <strong>módulo del vector desplazamiento ($||\Delta\vec{r}||$)</strong>.
+                        </p>
+                    </div>
+
+                    <button onclick="revelarElemento('yo-hago-res2'); this.classList.add('hidden')"
+                        class="w-[90%] mx-auto mb-6 px-6 py-4 bg-slate-900 text-white rounded-2xl text-2xl font-bold hover:bg-slate-800 transition shadow-xl shrink-0">
+                        Desarrollar Modelamiento
+                    </button>
+
+                    <div id="yo-hago-res2" class="hidden flex-1 overflow-y-auto scrollable-content px-6 pb-6 flex flex-col gap-6 animate-[fadeIn_0.5s_ease-out] bg-white border-t-4 border-indigo-200 pt-6">
+                        <div class="bg-amber-50 p-4 rounded-xl border-l-8 border-amber-500 font-mono text-xl shadow-sm">
+                            <span class="text-base block text-amber-600 uppercase font-sans font-bold border-b border-amber-200 pb-1 mb-2">1. Distancia (Escalar)</span>
+                            Suma la L: $4\text{ m}$ (Der) y $3\text{ m}$ (Arr).<br>
+                            $d = 4 + 3 = \mathbf{7\text{ m}}$
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-4 rounded-xl border-l-8 border-indigo-500 font-mono text-xl shadow-sm">
+                            <span class="text-base block text-indigo-600 uppercase font-sans font-bold border-b border-indigo-200 pb-1 mb-2">2. Desplazamiento</span>
+                            $\Delta\vec{r} = (6, 5) - (2, 2) = \mathbf{(4, 3)\text{ m}}$
+                        </div>
+
+                        <div class="bg-emerald-50 p-4 rounded-xl border-l-8 border-emerald-500 font-mono text-xl shadow-sm">
+                            <span class="text-base block text-emerald-600 uppercase font-sans font-bold border-b border-emerald-200 pb-1 mb-2">3. Módulo</span>
+                            $||\Delta\vec{r}|| = \sqrt{4^2 + 3^2} = \mathbf{5\text{ m}}$
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card bg-white border-4 border-indigo-200 overflow-hidden flex flex-col h-full shadow-inner p-6 relative">
+                    <svg viewBox="0 0 500 500" class="w-full h-full overflow-visible">
+                        <g stroke="#e2e8f0" stroke-width="2" stroke-dasharray="4,4">
+                            <line x1="50" y1="50" x2="450" y2="50"/><line x1="50" y1="130" x2="450" y2="130"/><line x1="50" y1="210" x2="450" y2="210"/><line x1="50" y1="290" x2="450" y2="290"/>
+                            <line x1="130" y1="50" x2="130" y2="450"/><line x1="210" y1="50" x2="210" y2="450"/><line x1="290" y1="50" x2="290" y2="450"/><line x1="370" y1="50" x2="370" y2="450"/>
+                        </g>
+
+                        <line x1="20" y1="450" x2="480" y2="450" stroke="#94a3b8" stroke-width="4"/>
+                        <line x1="50" y1="480" x2="50" y2="20" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="460" y="480" font-size="20" font-weight="bold" fill="#64748b" class="shadow-text">X (m)</text>
+                        <text x="10" y="20" font-size="20" font-weight="bold" fill="#64748b" class="shadow-text">Y (m)</text>
+                        
+                        <line x1="130" y1="440" x2="130" y2="460" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="120" y="485" font-size="24" fill="#475569" font-weight="bold" class="shadow-text">2</text>
+                        
+                        <line x1="450" y1="440" x2="450" y2="460" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="440" y="485" font-size="24" fill="#475569" font-weight="bold" class="shadow-text">6</text>
+
+                        <line x1="40" y1="370" x2="60" y2="370" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="15" y="378" font-size="24" fill="#475569" font-weight="bold" class="shadow-text">2</text>
+                        
+                        <line x1="40" y1="130" x2="60" y2="130" stroke="#94a3b8" stroke-width="4"/>
+                        <text x="15" y="138" font-size="24" fill="#475569" font-weight="bold" class="shadow-text">5</text>
+                        
+                        <path d="M 130 370 L 450 370 L 450 130" fill="none" stroke="#f59e0b" stroke-width="8" stroke-dasharray="8,6"/>
+                        <circle cx="130" cy="370" r="10" fill="#3b82f6"/>
+                        <text x="145" y="400" font-size="26" fill="#2563eb" font-weight="bold" class="shadow-text">Inicio</text>
+                        
+                        <circle cx="450" cy="130" r="10" fill="#ef4444"/>
+                        <text x="465" y="135" font-size="26" fill="#dc2626" font-weight="bold" class="shadow-text">Fin</text>
+                        
+                        <path d="M 130 370 L 450 130" fill="none" stroke="#10b981" stroke-width="10" marker-end="url(#arrMin2)"/>
+                        <text x="240" y="230" font-size="36" font-weight="extrabold" fill="#059669" class="shadow-text">$\Delta\vec{r}$</text>
+
+                        <text x="250" y="410" font-size="22" fill="#d97706" font-weight="bold" class="shadow-text">d = 4m</text>
+                        <text x="465" y="260" font-size="22" fill="#d97706" font-weight="bold" class="shadow-text">d = 3m</text>
+
+                        <defs>
+                            <marker id="arrMin2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#10b981"/></marker>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-slate-50 p-10 pb-32">
+            <div class="flex items-center gap-6 mb-6 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-800">Mecanización y Modelamiento Analítico</h2>
+            </div>
+
+            <p class="text-2xl text-slate-600 mb-8 border-l-8 border-emerald-500 pl-6 bg-white py-4 font-medium rounded-r-xl border border-slate-200 shadow-sm">Resuelva metódicamente en su cuaderno de trabajo. La complejidad analítica se incrementa identificando el color del recuadro.</p>
+
+            <div class="scrollable-content grid grid-cols-1 xl:grid-cols-2 gap-8 flex-1 overflow-y-auto pr-4 pb-12">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-emerald-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-full font-black text-2xl shrink-0">1</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Aplica el Teorema de Pitágoras de forma rigurosa para calcular el módulo absoluto del vector posición $\mathbf{\vec{v} = (6, -8)}$.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-emerald-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-emerald-50 text-emerald-600 rounded-full font-black text-2xl shrink-0">2</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Determina el ángulo de dirección ($\alpha$) del vector $\mathbf{\vec{u} = (4, 4)}$ evaluando la función trigonométrica inversa $\arctan(y/x)$.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-amber-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 rounded-full font-black text-2xl shrink-0">3</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Modela algebraicamente la contracción de un vector operando la siguiente ponderación escalar fraccionaria: $\mathbf{\frac{1}{2} \cdot (-10, 14)}$.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-amber-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-amber-50 text-amber-600 rounded-full font-black text-2xl shrink-0">4</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Realiza la adición algebraica del vector posición $\mathbf{\vec{r}_1 = (7, -2)}$ con el vector $\mathbf{\vec{r}_2 = (-3, 5)}$ para hallar el resultado neto.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-orange-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-orange-50 text-orange-600 rounded-full font-black text-2xl shrink-0">5</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Un vector $\mathbf{\vec{a} = (-4, 3)}$ es ponderado por el escalar $k = -2$. Calcula el vector resultante y describe teóricamente qué le ocurre a su sentido.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-orange-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-orange-50 text-orange-600 rounded-full font-black text-2xl shrink-0">6</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Resuelve la siguiente operación vectorial combinada respetando el orden y la jerarquía algebraica: $\mathbf{(2, -6) + (6, 12)}$.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-rose-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 rounded-full font-black text-2xl shrink-0">7</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Plantea y despeja analíticamente el vector incógnita $\mathbf{\vec{x}}$ en la siguiente ecuación cinemática: $\mathbf{\vec{x} + (2, -1) = (5, 6)}$.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-rose-500 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-600 rounded-full font-black text-2xl shrink-0">8</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Aplica la formulación $\vec{M} = \frac{1}{2}(\vec{r}_i+\vec{r}_f)$ para calcular el Punto Medio exacto que une los vectores posición $\mathbf{\vec{r}_i(-4, 8)}$ y $\mathbf{\vec{r}_f(10, -2)}$.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-indigo-600 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-indigo-50 text-indigo-700 rounded-full font-black text-2xl shrink-0">9</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed"><strong>Condición de Colinealidad:</strong> Los vectores $\mathbf{\vec{p} = (3, -2)}$ y $\mathbf{\vec{q} = (x, -8)}$ son paralelos ($\vec{q} = k\cdot\vec{p}$). Determina el valor exacto de la componente $x$.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-8 border-indigo-600 relative flex gap-6">
+                    <span class="w-12 h-12 flex items-center justify-center bg-indigo-50 text-indigo-700 rounded-full font-black text-2xl shrink-0">10</span>
+                    <p class="text-xl text-slate-800 font-medium leading-relaxed">Un objeto sufre dos desplazamientos: $\mathbf{\vec{d_1} = (-3, 7)}$ y $\mathbf{\vec{d_2} = (0, 0)}$. Deduce algebraicamente el vector de retorno $\mathbf{\vec{d_3}}$ necesario para que el objeto retorne exactamente al origen.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-slate-50 p-10 pb-32">
+            <div class="flex items-center justify-between mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <div class="flex items-center gap-6">
+                    <i data-lucide="crosshair" class="w-16 h-16 text-indigo-800"></i>
+                    <h2 class="text-6xl font-bold text-slate-900">Evaluación Cinemática de Síntesis</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-stretch relative">
+                
+                <div class="col-span-5 flex flex-col space-y-6 h-full">
+                    <div class="p-8 bg-white border-2 border-slate-200 rounded-3xl shadow-md flex-1 flex flex-col justify-center">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-4">
+                            Un atleta corre por el borde de una pista olímpica perfectamente circular cuyo radio es de $R = 10\text{ m}$. Inicia su movimiento en la coordenada cartesiana $(10, 0)$ y corre acelerando hasta detenerse exactamente al otro lado de la pista, en la coordenada opuesta $(-10, 0)$, completando media vuelta.
+                        </p>
+                        <p class="text-2xl font-extrabold text-indigo-900 leading-relaxed">
+                            Aplica tus conocimientos para dictaminar: ¿cuál fue la <strong>distancia recorrida ($d$)</strong> y cuál es el <strong>módulo de su desplazamiento ($||\Delta\vec{r}||$)</strong>?
+                        </p>
+                    </div>
+
+                    <div class="space-y-4 text-xl font-bold text-slate-700 font-mono">
+                        <p class="p-5 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) $d = 20\text{ m}$, $\;\;||\Delta\vec{r}|| = 10\pi\text{ m}$</p>
+                        <p class="p-5 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">B) $d = 10\pi\text{ m}$, $\;\;||\Delta\vec{r}|| = 20\text{ m}$</p>
+                        <p class="p-5 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">C) $d = 20\pi\text{ m}$, $\;\;||\Delta\vec{r}|| = 0\text{ m}$</p>
+                        <p class="p-5 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) $d = 10\pi\text{ m}$, $\;\;||\Delta\vec{r}|| = 10\text{ m}$</p>
+                    </div>
+                </div>
+
+                <div class="col-span-7 relative w-full h-full flex flex-col justify-between">
+                    
+                    <div class="w-full h-3/5 bg-white rounded-3xl border-4 border-slate-300 shadow-xl p-6 relative overflow-hidden flex items-center justify-center">
+                        <svg viewBox="-150 -150 300 300" class="w-full h-full overflow-visible">
+                            <line x1="-150" y1="120" x2="150" y2="120" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+                            <line x1="-120" y1="-150" x2="-120" y2="150" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,4"/>
+                            
+                            <circle cx="0" cy="0" r="100" fill="none" stroke="#e2e8f0" stroke-width="4"/>
+
+                            <g id="ts-dist" class="fade-in">
+                                <path d="M 100 0 A 100 100 0 0 0 -100 0" fill="none" stroke="#f59e0b" stroke-width="6" stroke-dasharray="8,6"/>
+                                <text x="-50" y="-115" font-size="20" font-weight="bold" fill="#d97706" class="shadow-text">Distancia (Arco)</text>
+                            </g>
+
+                            <circle cx="100" cy="0" r="8" fill="#3b82f6"/>
+                            <text x="115" y="-15" font-size="18" font-weight="bold" fill="#2563eb" class="shadow-text">Inicio (10,0)</text>
+
+                            <circle cx="-100" cy="0" r="8" fill="#ef4444"/>
+                            <text x="-180" y="25" font-size="18" font-weight="bold" fill="#dc2626" class="shadow-text">Fin (-10,0)</text>
+
+                            <g id="ts-desp" class="fade-in">
+                                <path d="M 100 0 L -100 0" fill="none" stroke="#10b981" stroke-width="8" marker-end="url(#arrGreenTS)"/>
+                                <text x="-60" y="25" font-size="20" font-weight="extrabold" fill="#059669" class="shadow-text">Desplazamiento</text>
+                            </g>
+
+                            <defs>
+                                <marker id="arrGreenTS" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto-start-reverse"><polygon points="0 0, 5 2.5, 0 5" fill="#10b981" /></marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <div class="w-full h-1/3 relative flex items-center justify-center mt-6">
+                        <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                            class="px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl w-full absolute inset-0 z-20 flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200">
+                            <i data-lucide="shield-check" class="w-10 h-10"></i> Ejecutar Verificación
+                        </button>
+
+                        <div id="respuesta-paes" class="absolute inset-0 z-10 fade-in">
+                            <div class="h-full w-full bg-white p-8 rounded-3xl border-4 border-indigo-500 flex flex-col text-left shadow-2xl overflow-y-auto scrollable-content">
+                                <p class="text-indigo-800 text-2xl font-extrabold border-b-4 border-indigo-100 pb-4 flex items-center justify-between mb-4 shrink-0 uppercase tracking-widest">
+                                    Resolución Analítica
+                                </p>
+
+                                <div class="text-lg text-slate-800 space-y-4 font-mono font-medium tracking-wide">
+                                    <p class="text-slate-500 font-sans font-bold uppercase tracking-widest">1. Distancia Escalar (Camino)</p>
+                                    <div class="bg-amber-50 p-4 border-l-8 border-amber-400 rounded-r-xl shadow-inner text-xl font-bold">
+                                        Perímetro de medio círculo: $d = \frac{2\pi R}{2} = \pi \cdot 10 = \mathbf{10\pi\text{ m}}$.
+                                    </div>
+                                    <p class="text-slate-500 font-sans font-bold uppercase tracking-widest mt-2">2. Vector Desplazamiento</p>
+                                    <div class="bg-emerald-50 p-4 border-l-8 border-emerald-400 rounded-r-xl shadow-inner text-xl font-bold">
+                                        Línea recta del inicio al fin. Matemáticamente es el diámetro.<br>
+                                        $||\Delta\vec{r}|| = 2 \cdot R = 2 \cdot 10 = \mathbf{20\text{ m}}$.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 3: Cinemática y Movimiento</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarElemento(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (el.classList.contains('hidden')) {
+                    el.classList.remove('hidden');
+                    if (window.MathJax) {
+                        try { MathJax.typesetPromise([el]).catch(e => console.log(e)); } catch (e) { }
+                    }
+                }
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.classList.add('opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                setTimeout(() => target.classList.add('visible'), 50);
+            }, 100);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-indigo-100', 'border-indigo-500', 'text-indigo-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            document.getElementById('ts-dist').classList.add('visible');
+            setTimeout(() => {
+                document.getElementById('ts-desp').classList.add('visible');
+            }, 800);
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) { }
+            }
+        }
+
+        // MOTOR CANVAS: Vector Posición R(t)
+        let rAnimId;
+        function startPositionAnimation() {
+            if (rAnimId) return; 
+            
+            const path = document.getElementById('anim-r-path');
+            const vector = document.getElementById('anim-r-vector');
+            const dot = document.getElementById('anim-r-dot');
+            const txtTime = document.getElementById('anim-r-time');
+            const txtCoord = document.getElementById('anim-r-coord');
+            const label = document.getElementById('anim-r-label');
+
+            let t = 0;
+            let pathD = "M 0 400 "; 
+            
+            function animate() {
+                t += 0.015;
+                
+                let x = t * 50; 
+                let y = 400 - (180 * Math.sin(t*1.2) + 40 * t);
+                
+                if (x > 400) x = 400; 
+
+                dot.setAttribute('cx', x);
+                dot.setAttribute('cy', y);
+                vector.setAttribute('d', `M 0 400 L ${x} ${y}`);
+                
+                pathD += `L ${x} ${y} `;
+                path.setAttribute('d', pathD);
+
+                label.setAttribute('x', (x/2) - 30);
+                label.setAttribute('y', (y + (400-y)/2) - 30);
+
+                let realX = (x / 50).toFixed(1);
+                let realY = ((400 - y) / 50).toFixed(1);
+                txtTime.textContent = `t = ${t.toFixed(1)} s`;
+                txtCoord.textContent = `r = (${realX}, ${realY})`;
+
+                if (x < 400) {
+                    rAnimId = requestAnimationFrame(animate);
+                }
+            }
+            animate();
+        }
+
+        // ANIMACIÓN: Secuencia Poligonal (Sin saltos CSS)
+        let poliAnimStep = 0;
+        function animarSecuenciaPoligonal() {
+            const btn = document.getElementById('btn-poligonal');
+            if (poliAnimStep === 0) {
+                document.getElementById('seq-desp').classList.add('visible');
+                btn.innerHTML = '<i data-lucide="grid"></i> Paso 2: Aproximar con Poligonal';
+                lucide.createIcons();
+                poliAnimStep = 1;
+            } else if (poliAnimStep === 1) {
+                document.getElementById('seq-poli').classList.add('visible');
+                
+                btn.classList.add('opacity-0', 'pointer-events-none');
+                
+                const form = document.getElementById('form-poligonal');
+                form.classList.remove('hidden');
+                setTimeout(() => form.classList.add('visible'), 50);
+                
+                if (window.MathJax) {
+                    try { MathJax.typesetPromise([form]).catch(e => console.log(e)); } catch (e) { }
+                }
+                
+                poliAnimStep = 2;
+            }
+        }
+    </script>
+</body>
+
+</html>
+    
+  </body>
+  
+</html>
