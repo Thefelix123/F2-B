@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>C7</title>
+    
+
+  </head>
+    
+  <body>
+  <!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinemática: MRUA - F2</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        /* Scrollbars (Restaurados al Índigo Original) */
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        /* Utilities */
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+        
+        .shadow-text {
+            text-shadow: 3px 3px 0px #fff, -3px -3px 0px #fff, 3px -3px 0px #fff, -3px 3px 0px #fff, 0px 3px 0px #fff, 0px -3px 0px #fff, 3px 0px 0px #fff, -3px 0px 0px #fff;
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.03] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="gauge" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="rocket" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Movimiento Rectilíneo<br>Uniformemente Acelerado
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    MRUA: La Aceleración Entra en Juego
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="camera" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Fotografía Estroboscópica: El Rastro</h2>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-4 flex flex-col justify-center">
+                    <div class="space-y-6 mb-4">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Imagina una cámara en una habitación oscura que toma una foto cada <strong>1 segundo</strong> exactamente. 
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">Análisis del Rastro</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                Observa la separación entre las "imágenes fantasma" de ambos objetos. ¿Qué nos dice la distancia entre puntos sobre la velocidad en ese intervalo de tiempo?
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="relative w-full min-h-[5rem] mt-6">
+                        <button onclick="iniciarEstroboscopio(); this.style.display='none';" id="btn-estrobo"
+                            class="absolute inset-0 m-auto h-max px-6 py-5 bg-slate-900 text-white rounded-xl text-2xl font-bold hover:bg-slate-800 transition shadow-xl flex items-center justify-center gap-3 w-full z-20">
+                            <i data-lucide="zap"></i> Disparar Flashes (1s)
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="col-span-8 glass-card border-4 border-slate-200 overflow-hidden shadow-xl relative w-full h-full bg-slate-900 flex flex-col justify-center p-6">
+                    <svg viewBox="-20 0 800 300" class="w-full h-full" id="svg-estrobo">
+                        <line x1="0" y1="100" x2="800" y2="100" stroke="#475569" stroke-width="2" stroke-dasharray="10,5"/>
+                        <line x1="0" y1="200" x2="800" y2="200" stroke="#475569" stroke-width="2" stroke-dasharray="10,5"/>
+                        <text x="0" y="60" fill="#3b82f6" font-size="20" font-weight="bold">Móvil A (MRU)</text>
+                        <text x="0" y="160" fill="#ef4444" font-size="20" font-weight="bold">Móvil B (MRUA)</text>
+                        <circle cx="20" cy="100" r="12" fill="#3b82f6"/>
+                        <circle cx="20" cy="200" r="12" fill="#ef4444"/>
+                        <g id="rastros-group"></g>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="bar-chart-2" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Definiendo la Aceleración ($a$)</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-8 flex-1">
+                <div class="glass-card p-8 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white shrink-0">
+                    <p class="text-2xl text-slate-700 leading-relaxed font-medium mb-4 text-center max-w-4xl">
+                        La aceleración mide <strong>la tasa de cambio de la velocidad</strong> en el tiempo. Nos indica cuántos metros por segundo ($m/s$) aumenta o disminuye la velocidad por cada segundo ($s$) que pasa.
+                    </p>
+                    <div class="bg-indigo-50 p-6 rounded-3xl font-mono text-[3.5rem] text-center text-indigo-800 font-black border border-indigo-200 shadow-inner">
+                        $$ a = \frac{\Delta v}{\Delta t} = \frac{v_f - v_i}{t_f - t_i} $$
+                    </div>
+                    <p class="mt-4 text-xl font-bold text-slate-500 tracking-widest uppercase">Unidad S.I.: $m/s^2$</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-10 h-full pb-10">
+                    <div class="glass-card p-8 border-l-8 border-slate-400 flex flex-col justify-start bg-white shadow-md relative overflow-hidden">
+                        <div class="absolute right-0 top-0 h-full w-3 bg-slate-100"></div>
+                        <p class="text-3xl font-extrabold text-slate-900 mb-6 border-b-2 border-slate-100 pb-4">Recordando el MRU</p>
+                        <ul class="text-xl text-slate-700 space-y-6 font-medium pr-6">
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="minus" class="w-8 h-8 text-slate-400 shrink-0"></i>
+                                <span>La velocidad es <strong>constante</strong>. No cambia.</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="x-circle" class="w-8 h-8 text-slate-400 shrink-0"></i>
+                                <span>Por lo tanto, la aceleración es <strong>nula</strong> ($a = 0$).</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="arrow-right" class="w-8 h-8 text-slate-400 shrink-0"></i>
+                                <span>Recorre distancias <strong>iguales</strong> en tiempos iguales.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="glass-card p-8 border-l-8 border-indigo-500 flex flex-col justify-start bg-white shadow-md relative overflow-hidden">
+                        <div class="absolute right-0 top-0 h-full w-3 bg-indigo-50"></div>
+                        <p class="text-3xl font-extrabold text-slate-900 mb-6 border-b-2 border-slate-100 pb-4">Entrando al MRUA</p>
+                        <ul class="text-xl text-slate-700 space-y-6 font-medium pr-6">
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="trending-up" class="w-8 h-8 text-indigo-500 shrink-0"></i>
+                                <span>La velocidad <strong>cambia</strong> (aumenta o frena).</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="check-circle-2" class="w-8 h-8 text-indigo-500 shrink-0"></i>
+                                <span>La aceleración es <strong>distinta de cero y constante</strong> ($a \neq 0$).</span>
+                            </li>
+                            <li class="flex items-center gap-4">
+                                <i data-lucide="expand" class="w-8 h-8 text-indigo-500 shrink-0"></i>
+                                <span>Recorre distancias <strong>diferentes</strong> en tiempos iguales.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="calculator" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">El Arsenal Matemático del MRUA</h2>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-8 flex-1 items-stretch">
+                <div class="glass-card p-8 border-t-8 border-blue-500 shadow-md flex flex-col items-center justify-center bg-white transform transition hover:-translate-y-2 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-5 pointer-events-none flex justify-center items-center">
+                        <i data-lucide="gauge" class="w-64 h-64 text-blue-900"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 mb-2 z-10 text-center">Ecuación de Velocidad</p>
+                    <p class="text-md text-slate-500 font-medium mb-6 z-10 text-center h-12">Predice qué tan rápido irá el objeto en un instante futuro.</p>
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200 w-full flex justify-center shadow-inner z-10">
+                        <span class="text-3xl font-mono font-black text-blue-800">$$ v_f = v_i + a \cdot t $$</span>
+                    </div>
+                    <div class="mt-6 w-full text-center z-10">
+                        <span class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-bold border border-slate-200">Naturaleza Lineal</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 border-t-8 border-indigo-600 shadow-lg flex flex-col items-center justify-center bg-white transform transition hover:-translate-y-2 relative overflow-hidden scale-105 z-10">
+                    <div class="absolute inset-0 opacity-5 pointer-events-none flex justify-center items-center">
+                        <i data-lucide="map-pin" class="w-64 h-64 text-indigo-900"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 mb-2 z-10 text-center">Ecuación Itineraria</p>
+                    <p class="text-md text-slate-500 font-medium mb-6 z-10 text-center h-12">Determina la posición exacta en el espacio para cualquier tiempo.</p>
+                    <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 w-full flex justify-center shadow-inner z-10">
+                        <span class="text-3xl font-mono font-black text-indigo-800">$$ x(t) = x_0 + v_i t + \frac{1}{2}at^2 $$</span>
+                    </div>
+                    <div class="mt-6 w-full text-center z-10">
+                        <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold border border-indigo-300">Naturaleza Cuadrática (Parábola)</span>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 border-t-8 border-emerald-500 shadow-md flex flex-col items-center justify-center bg-white transform transition hover:-translate-y-2 relative overflow-hidden">
+                    <div class="absolute inset-0 opacity-5 pointer-events-none flex justify-center items-center">
+                        <i data-lucide="timer-off" class="w-64 h-64 text-emerald-900"></i>
+                    </div>
+                    <p class="text-2xl font-bold text-slate-800 mb-2 z-10 text-center">Ecuación de Torricelli</p>
+                    <p class="text-md text-slate-500 font-medium mb-6 z-10 text-center h-12">Relaciona velocidades y distancia sin depender del tiempo.</p>
+                    <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 w-full flex justify-center shadow-inner z-10">
+                        <span class="text-3xl font-mono font-black text-emerald-800">$$ v_f^2 = v_i^2 + 2a\Delta x $$</span>
+                    </div>
+                    <div class="mt-6 w-full text-center z-10">
+                        <span class="inline-block bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-sm font-bold border border-slate-200">Independiente de "t"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="car-front" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje Analítico: Frenado de Emergencia</h2>
+            </div>
+            
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Un ingeniero evalúa el sistema de frenos de un automóvil que viaja a <strong class="text-blue-700">$30\text{ m/s}$</strong>. Al ver un obstáculo, el conductor pisa el freno a fondo, generando una aceleración constante de <strong class="text-rose-600">$-5\text{ m/s}^2$</strong> hasta detenerse por completo.
+                    <br><br>
+                    <strong>A)</strong> ¿Cuánto tiempo tarda en detenerse? <br>
+                    <strong>B)</strong> ¿Qué distancia recorrió durante el frenado?
+                </p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-6 flex-1 min-h-[20rem]">
+                <div class="flex flex-col gap-4">
+                    <button onclick="revelarPaso('paso1-datos', this)" class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                        <i data-lucide="list-checks"></i> 1. Extraer Datos
+                    </button>
+                    <div id="paso1-datos" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner flex-1">
+                        <ul class="space-y-4 text-xl font-mono text-slate-700">
+                            <li><span class="font-bold text-slate-400">Vel. Inicial:</span> $v_i = 30\text{ m/s}$</li>
+                            <li><span class="font-bold text-slate-400">Aceleración:</span> $a = -5\text{ m/s}^2$</li>
+                            <li><span class="font-bold text-slate-400">Vel. Final:</span> $v_f = 0\text{ m/s}$ <span class="text-sm font-sans text-rose-500 font-bold ml-2">(Se detiene)</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <button id="btn-paso2" onclick="revelarPaso('paso2-ecs', this)" class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                        <i data-lucide="target"></i> 2. Elegir Ecuación
+                    </button>
+                    <div id="paso2-ecs" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner flex-1">
+                        <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-2">Para el Tiempo (A)</p>
+                        <p class="text-xl font-mono text-slate-800 mb-6">$$ v_f = v_i + a \cdot t $$</p>
+                        
+                        <p class="text-sm font-bold text-indigo-500 uppercase tracking-widest mb-2">Para la Distancia (B)</p>
+                        <p class="text-xl font-mono text-slate-800">$$ v_f^2 = v_i^2 + 2a\Delta x $$</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <button id="btn-paso3" onclick="revelarPaso('paso3-res', this)" class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                        <i data-lucide="check-square"></i> 3. Resolver
+                    </button>
+                    <div id="paso3-res" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner flex-1 overflow-y-auto">
+                        <p class="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Cálculo de Tiempo</p>
+                        <div class="text-lg font-mono text-slate-800 mb-4 border-b border-emerald-200 pb-2">
+                            $0 = 30 + (-5)t$<br>
+                            $5t = 30 \implies \mathbf{t = 6\text{ s}}$
+                        </div>
+                        <p class="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Cálculo de Distancia</p>
+                        <div class="text-lg font-mono text-slate-800">
+                            $0^2 = 30^2 + 2(-5)\Delta x$<br>
+                            $0 = 900 - 10\Delta x$<br>
+                            $10\Delta x = 900 \implies \mathbf{\Delta x = 90\text{ m}}$
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide p-10 bg-slate-50 pb-32">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Mecanización y Análisis Gráfico</h2>
+            </div>
+            
+            <div class="grid grid-cols-12 gap-10 flex-1 overflow-hidden">
+                <div class="col-span-7 flex flex-col gap-6 overflow-y-auto pr-4 scrollable-content pb-10">
+                    <p class="text-xl text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0">
+                        Desarrolla en tu cuaderno usando el método: Datos $\rightarrow$ Ecuación $\rightarrow$ Resolución.
+                    </p>
+
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un auto parte del reposo y acelera a $3\text{ m/s}^2$. ¿Qué velocidad alcanza después de $8\text{ s}$?</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un motociclista viaja a $15\text{ m/s}$ y acelera a $2\text{ m/s}^2$ durante $4\text{ s}$. Calcula la distancia total recorrida en ese tiempo.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un tren viaja a $25\text{ m/s}$. Al aplicar los frenos, se detiene en una distancia de $125\text{ m}$. ¿Cuál fue su aceleración de frenado?</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un avión necesita alcanzar una velocidad de $80\text{ m/s}$ para despegar. Si la pista tiene $1600\text{ m}$ y parte del reposo, ¿qué aceleración mínima necesita?</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un guepardo corre a $10\text{ m/s}$ y acelera a $4\text{ m/s}^2$ hasta alcanzar $30\text{ m/s}$. Despeja algebraicamente la ecuación para calcular cuánto tiempo le tomó.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Observando un gráfico $v-t$: La velocidad pasa de $0$ a $20\text{ m/s}$ en $5\text{ s}$ formando un triángulo. Calcula el desplazamiento total usando el concepto de área.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">7</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un cohete espacial enciende sus motores, cambiando su velocidad de $200\text{ m/s}$ a $500\text{ m/s}$ en un trayecto rectilíneo de $7000\text{ m}$. Calcula la aceleración experimentada.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Dos tramos:</strong> Un ciclista parte del reposo acelerando a $2\text{ m/s}^2$ por $5\text{ s}$. Luego, mantiene esa velocidad constante por $10\text{ s}$ más. Calcula la distancia total recorrida.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">9</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed">Un camión viaja a $20\text{ m/s}$ y frena con $a = -2\text{ m/s}^2$. ¿Qué distancia exacta recorre durante el <em>último segundo</em> antes de detenerse por completo?</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-t-8 border-purple-600 shadow-md flex gap-4 shrink-0">
+                        <span class="w-10 h-10 flex items-center justify-center bg-purple-100 text-purple-700 rounded-full font-bold text-xl shrink-0">10</span>
+                        <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Desafío Cinemático:</strong> El Auto A viaja a $30\text{ m/s}$ constantes. El Auto B parte del reposo en el mismo instante y lugar, acelerando a $4\text{ m/s}^2$. Construye ambas ecuaciones e iguala para descubrir en qué instante ($t$) el Auto B alcanza al Auto A.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-5 flex flex-col gap-6">
+                    <div class="glass-card p-6 border-4 border-slate-200 shadow-md bg-white flex flex-col items-center h-1/2">
+                        <p class="text-xl text-slate-800 font-bold mb-2">Posición vs. Tiempo ($x-t$)</p>
+                        <p class="text-sm text-slate-600 text-center mb-2">MRUA genera una <strong>Parábola</strong>.</p>
+                        <div class="w-full flex-1 flex items-center justify-center">
+                            <svg viewBox="-20 -10 240 160" class="w-full h-full max-h-[150px]">
+                                <line x1="0" y1="140" x2="200" y2="140" stroke="#94a3b8" stroke-width="3"/>
+                                <line x1="0" y1="140" x2="0" y2="0" stroke="#94a3b8" stroke-width="3"/>
+                                <text x="210" y="145" font-size="14" font-weight="bold" fill="#64748b">t</text>
+                                <text x="-15" y="10" font-size="14" font-weight="bold" fill="#64748b">x</text>
+                                <path d="M 0 140 Q 100 140 180 20" fill="none" stroke="#4f46e5" stroke-width="4"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 border-4 border-slate-200 shadow-md bg-white flex flex-col items-center h-1/2 relative overflow-hidden">
+                        <p class="text-xl text-slate-800 font-bold mb-2">Velocidad vs. Tiempo ($v-t$)</p>
+                        <p class="text-sm text-slate-600 text-center mb-2">Pendiente = Aceleración | Área = Desplazamiento ($\Delta x$).</p>
+                        <div class="w-full flex-1 flex items-center justify-center">
+                            <svg viewBox="-20 -10 240 160" class="w-full h-full max-h-[150px]">
+                                <line x1="0" y1="140" x2="200" y2="140" stroke="#94a3b8" stroke-width="3"/>
+                                <line x1="0" y1="140" x2="0" y2="0" stroke="#94a3b8" stroke-width="3"/>
+                                <text x="210" y="145" font-size="14" font-weight="bold" fill="#64748b">t</text>
+                                <text x="-15" y="10" font-size="14" font-weight="bold" fill="#64748b">v</text>
+                                <polygon points="0,140 0,80 150,20 150,140" fill="#c7d2fe" opacity="0.5"/>
+                                <path d="M 0 80 L 150 20" fill="none" stroke="#4f46e5" stroke-width="4"/>
+                                <line x1="150" y1="20" x2="150" y2="140" stroke="#4f46e5" stroke-width="2" stroke-dasharray="4,4"/>
+                                <text x="60" y="100" font-size="16" font-weight="extrabold" fill="#4f46e5">ÁREA</text>
+                                <text x="-25" y="85" font-size="14" font-weight="bold" fill="#334155">v₀</text>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide bg-white p-10 pb-32">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+                
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Un dron de inspección acelera desde el reposo. Su ecuación itineraria en unidades S.I. está modelada por la siguiente expresión:
+                        </p>
+                        <div class="bg-white p-4 rounded-xl border border-slate-300 text-center mb-6 shadow-inner">
+                            <span class="text-4xl font-mono font-bold text-indigo-900">$$ x(t) = 2t^2 $$</span>
+                        </div>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            A partir del modelo matemático, ¿cuál de las siguientes afirmaciones es estrictamente verdadera?
+                        </p>
+                    </div>
+
+                    <div class="space-y-4 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white transition cursor-pointer hover:bg-slate-100">A) Su velocidad inicial es de $2\text{ m/s}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white transition cursor-pointer hover:bg-slate-100" id="correct-opt-paes">B) Su aceleración constante es de $4\text{ m/s}^2$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white transition cursor-pointer hover:bg-slate-100">C) A los $3$ segundos habrá recorrido $6\text{ m}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white transition cursor-pointer hover:bg-slate-100">D) Su aceleración aumenta a medida que pasa el tiempo.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+                    
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+
+                        <div class="text-xl text-slate-800 space-y-5 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">Análisis de la Ecuación Itineraria:</span> La forma general es $x(t) = x_0 + v_i t + \frac{1}{2}at^2$. Al comparar con $x(t) = 2t^2$, notamos que no hay término independiente ni término con $t$. Por ende, $x_0 = 0$ y $v_i = 0$ (Falsa A).
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">Identificando la Aceleración:</span> El coeficiente que acompaña a $t^2$ es $2$. Sabemos que en la fórmula, ese coeficiente equivale a $\frac{1}{2}a$. <br>Por lo tanto: $\frac{1}{2}a = 2 \implies \mathbf{a = 4\text{ m/s}^2}$ (Alternativa B correcta).
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner text-slate-600 text-lg">
+                                *Nota: La (C) es falsa porque al evaluar $t=3$, $x(3) = 2(3)^2 = 18\text{m}$. La (D) es falsa porque en un MRUA la aceleración es constante.*
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 7: MRUA</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        // Animación del Estroboscopio (Slide 2)
+        let estroboActivo = false;
+        function iniciarEstroboscopio() {
+            if (estroboActivo) return;
+            estroboActivo = true;
+
+            const group = document.getElementById('rastros-group');
+            group.innerHTML = ''; 
+            
+            let t = 0;
+            const tMax = 6; 
+            const x0 = 20;
+            const v_mru = 100; 
+            const v0_mrua = 20; 
+            const a_mrua = 30; 
+
+            const intervalo = setInterval(() => {
+                t++;
+                const x_A = x0 + (v_mru * t);
+                const x_B = x0 + (v0_mrua * t) + (0.5 * a_mrua * Math.pow(t, 2));
+
+                const dotA = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dotA.setAttribute('cx', x_A); dotA.setAttribute('cy', '100'); dotA.setAttribute('r', '12'); dotA.setAttribute('fill', '#3b82f6'); dotA.setAttribute('opacity', '0.6');
+                
+                const dotB = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dotB.setAttribute('cx', x_B); dotB.setAttribute('cy', '200'); dotB.setAttribute('r', '12'); dotB.setAttribute('fill', '#ef4444'); dotB.setAttribute('opacity', '0.6');
+
+                if (x_A < 780) group.appendChild(dotA);
+                if (x_B < 780) group.appendChild(dotB);
+
+                if (t >= tMax || (x_A > 800 && x_B > 800)) {
+                    clearInterval(intervalo);
+                    estroboActivo = false; 
+                }
+            }, 800); 
+        }
+
+        // Revelado Secuencial (Slide 5)
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+            
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+            
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+            
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1-datos') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2-ecs') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        // Ticket PAES (Slide 7)
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+            
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>
+    
+  </body>
+  
+</html>
