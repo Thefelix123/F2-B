@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C10 — Primera Ley de Newton: Inercia</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                macros: { sen: "\\sin" }
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        @keyframes busBrake {
+            0%, 20% { transform: translateX(0); }
+            40% { transform: translateX(14px); }
+            60%, 100% { transform: translateX(0); }
+        }
+        @keyframes leanForward {
+            0%, 25% { transform: rotate(0deg); }
+            48%, 66% { transform: rotate(20deg); }
+            100% { transform: rotate(0deg); }
+        }
+        .anim-bus { animation: busBrake 4s ease-in-out infinite; }
+        .anim-pass { animation: leanForward 4s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="anchor" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="pause-circle" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Primera Ley de Newton<br>El Principio de Inercia
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    "Si nadie te empuja, sigues haciendo lo mismo"
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C10</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">El Pasajero que se Fue para Adelante</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Vas parado dentro de un bus. El conductor frena bruscamente. Tu cuerpo se inclina <strong>hacia adelante</strong>, aunque nadie te empuja.
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">¿Quién te empujó?</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                Nadie. Tu cuerpo simplemente <strong>quería seguir moviéndose</strong> con la velocidad que llevaba el bus. Esa "resistencia al cambio de movimiento" se llama <strong class="text-indigo-700">inercia</strong>.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">Pregunta clave:</strong> ¿qué hace un cuerpo cuando ninguna fuerza externa actúa sobre él? La respuesta es la <strong>Primera Ley de Newton</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 400 280" class="w-full h-full">
+                        <line x1="20" y1="240" x2="380" y2="240" stroke="#475569" stroke-width="3"/>
+                        <line x1="20" y1="248" x2="380" y2="248" stroke="#334155" stroke-width="3" stroke-dasharray="20,15"/>
+
+                        <!-- Líneas de movimiento: el bus venía avanzando hacia la derecha -->
+                        <line x1="14" y1="175" x2="58" y2="175" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+                        <line x1="8" y1="198" x2="52" y2="198" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+                        <line x1="16" y1="220" x2="50" y2="220" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.28"/>
+
+                        <g class="anim-bus">
+                            <rect x="70" y="158" width="210" height="72" fill="#1e293b" stroke="#94a3b8" stroke-width="2" rx="8"/>
+                            <rect x="92" y="174" width="42" height="30" fill="#38bdf8" stroke="#0ea5e9" stroke-width="1.5" rx="3"/>
+                            <rect x="210" y="174" width="42" height="30" fill="#38bdf8" stroke="#0ea5e9" stroke-width="1.5" rx="3"/>
+                            <circle cx="112" cy="232" r="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                            <circle cx="238" cy="232" r="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+                            <text x="238" y="150" font-size="12" fill="#94a3b8" font-weight="bold">BUS →</text>
+
+                            <!-- Pasajero: se inclina hacia adelante (pivota en los pies) -->
+                            <g class="anim-pass">
+                                <circle cx="165" cy="178" r="9" fill="#fbbf24"/>
+                                <rect x="159" y="187" width="12" height="24" fill="#fbbf24" rx="3"/>
+                                <line x1="159" y1="193" x2="147" y2="201" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="171" y1="193" x2="183" y2="201" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="161" y1="211" x2="155" y2="229" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                                <line x1="169" y1="211" x2="175" y2="229" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+                            </g>
+                        </g>
+
+                        <text x="298" y="200" font-size="17" fill="#f87171" font-weight="900">¡FRENA!</text>
+
+                        <text x="20" y="40" font-size="16" fill="#fbbf24" font-weight="800">El pasajero sigue hacia adelante</text>
+                        <text x="20" y="62" font-size="13" fill="#cbd5e1">por inercia, aunque el bus frene.</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: Inercia, Efectos y Equilibrio</h2>
+            </div>
+
+            <div class="flex flex-col gap-5 flex-1">
+
+                <div class="glass-card p-6 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white shrink-0">
+                    <p class="text-sm uppercase tracking-widest font-bold text-indigo-700 mb-2">Enunciado formal</p>
+                    <p class="text-xl text-slate-800 leading-relaxed font-medium text-center max-w-5xl">
+                        <strong>Todo cuerpo permanece en reposo o en movimiento rectilíneo uniforme, a menos que sobre él actúe una fuerza neta distinta de cero.</strong>
+                    </p>
+                    <div class="bg-indigo-50 px-6 py-3 rounded-2xl text-2xl text-center text-indigo-800 font-black border border-indigo-200 shadow-inner mt-4">
+                        $$ \sum \vec{F} = 0 \;\;\Longleftrightarrow\;\; \vec{v} = \text{constante} $$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-5 flex-1">
+
+                    <div class="glass-card p-5 border-l-8 border-blue-500 shadow-md bg-white flex flex-col">
+                        <p class="text-2xl font-extrabold text-slate-900 mb-3 border-b-2 border-slate-100 pb-2">Efectos de una fuerza sobre un cuerpo</p>
+                        <ul class="text-base text-slate-700 space-y-3 font-medium flex-1">
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="move-right" class="w-7 h-7 text-blue-600 shrink-0 mt-1"></i>
+                                <span><strong class="text-blue-700">Traslación:</strong> cambia la posición del cuerpo (lo acelera, frena o desvía).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="rotate-cw" class="w-7 h-7 text-purple-600 shrink-0 mt-1"></i>
+                                <span><strong class="text-purple-700">Rotación:</strong> hace girar al cuerpo respecto a un eje (ej. un volante).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i data-lucide="shapes" class="w-7 h-7 text-rose-600 shrink-0 mt-1"></i>
+                                <span><strong class="text-rose-700">Deformación:</strong> modifica la forma o tamaño (comprimir resorte, doblar barra).</span>
+                            </li>
+                        </ul>
+                        <p class="text-xs italic text-slate-500 mt-3">Una misma fuerza puede producir uno o varios efectos a la vez, según dónde se aplique.</p>
+                    </div>
+
+                    <div class="glass-card p-5 border-l-8 border-emerald-500 shadow-md bg-white flex flex-col">
+                        <p class="text-2xl font-extrabold text-slate-900 mb-3 border-b-2 border-slate-100 pb-2">Condición de equilibrio de traslación</p>
+                        <p class="text-base text-slate-700 leading-relaxed font-medium mb-3">
+                            Un cuerpo está en <strong class="text-emerald-700">equilibrio de traslación</strong> cuando la suma vectorial de todas las fuerzas que actúan sobre él es cero.
+                        </p>
+                        <div class="bg-emerald-50 px-4 py-3 rounded-2xl text-center border border-emerald-200">
+                            <p class="text-2xl font-mono font-black text-emerald-700">$$ \sum F_x = 0 \quad \text{y} \quad \sum F_y = 0 $$</p>
+                        </div>
+                        <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                            <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <p class="font-bold text-slate-700">Equilibrio estático</p>
+                                <p class="text-slate-600">El cuerpo está en reposo.</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <p class="font-bold text-slate-700">Equilibrio dinámico</p>
+                                <p class="text-slate-600">El cuerpo se mueve con $\vec{v}$ constante.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: La Lámpara Colgante</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Una lámpara de <strong class="text-indigo-700">$50\text{ N}$</strong> cuelga inmóvil del techo mediante una sola cuerda vertical. La lámpara está en <strong>equilibrio estático</strong>.
+                    <br><br>
+                    <strong>A)</strong> Identifica todas las fuerzas que actúan sobre la lámpara.<br>
+                    <strong>B)</strong> Determina el valor de la tensión $T$ en la cuerda.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[20rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1-fuerzas', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Identificar Fuerzas
+                        </button>
+                        <div id="paso1-fuerzas" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <ul class="space-y-2 text-lg font-mono text-slate-700">
+                                <li><span class="font-bold text-amber-600">Tensión:</span> $\vec{T}$ — hacia arriba (la cuerda sostiene la lámpara).</li>
+                                <li><span class="font-bold text-rose-600">Peso:</span> $\vec{P} = 50\text{ N}$ — hacia abajo (la gravedad).</li>
+                                <li><span class="font-bold text-emerald-600">Estado:</span> reposo $\Rightarrow$ equilibrio.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2-ecuacion', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Aplicar 1ª Ley
+                        </button>
+                        <div id="paso2-ecuacion" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-2">Equilibrio vertical</p>
+                            <p class="text-xl font-mono text-slate-800 text-center mb-2">$$ \sum F_y = 0 $$</p>
+                            <p class="text-xl font-mono text-slate-800 text-center">$$ T - P = 0 $$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3-resp', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Despejar
+                        </button>
+                        <div id="paso3-resp" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-xl font-mono text-slate-800 text-center mb-2">$T = P = 50\text{ N}$</p>
+                            <p class="text-2xl font-mono text-emerald-700 font-extrabold text-center">$\mathbf{T = 50\text{ N}}$</p>
+                            <p class="text-sm italic text-slate-600 mt-2 text-center">La cuerda ejerce una fuerza igual y opuesta al peso. Por eso la lámpara no se mueve.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 260 330" class="w-full h-full" style="max-height:440px">
+                        <defs>
+                            <marker id="ahAm5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                            <marker id="ahRo5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fb7185"/></marker>
+                        </defs>
+
+                        <!-- Techo -->
+                        <rect x="40" y="18" width="180" height="14" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+                        <line x1="55" y1="32" x2="45" y2="46" stroke="#94a3b8" stroke-width="1.5"/>
+                        <line x1="80" y1="32" x2="70" y2="46" stroke="#94a3b8" stroke-width="1.5"/>
+                        <line x1="105" y1="32" x2="95" y2="46" stroke="#94a3b8" stroke-width="1.5"/>
+                        <line x1="180" y1="32" x2="170" y2="46" stroke="#94a3b8" stroke-width="1.5"/>
+                        <line x1="205" y1="32" x2="195" y2="46" stroke="#94a3b8" stroke-width="1.5"/>
+
+                        <!-- Cuerda -->
+                        <line x1="130" y1="32" x2="130" y2="140" stroke="#64748b" stroke-width="2" stroke-dasharray="5,4"/>
+
+                        <!-- Lámpara: pantalla + ampolleta -->
+                        <path d="M 108 140 L 152 140 L 166 178 L 94 178 Z" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+                        <circle cx="130" cy="192" r="11" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+
+                        <!-- Tensión (hacia arriba) -->
+                        <line x1="130" y1="138" x2="130" y2="52" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahAm5)" class="vec-arrow"/>
+                        <text x="142" y="98" font-size="17" font-weight="900" fill="#fde68a">T = 50 N</text>
+
+                        <!-- Peso (hacia abajo) -->
+                        <line x1="130" y1="206" x2="130" y2="296" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahRo5)" class="vec-arrow"/>
+                        <text x="142" y="256" font-size="17" font-weight="900" fill="#fda4af">P = 50 N</text>
+
+                        <text x="130" y="320" font-size="12" fill="#94a3b8" font-style="italic" text-anchor="middle">equilibrio: T = P</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                Para cada caso, identifica si el cuerpo está en equilibrio o no, dibuja el diagrama de fuerzas y aplica $\sum \vec{F} = 0$ cuando corresponda.
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un cuadro de $30\text{ N}$ cuelga inmóvil de un clavo mediante un alambre vertical. Calcula la tensión que soporta el alambre.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un libro de $8\text{ N}$ descansa sobre la mesa sin moverse. ¿Cuál es el valor de la fuerza normal que ejerce la mesa sobre él?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre una caja actúan tres fuerzas horizontales colineales: $\vec{F_1} = 20\text{ N}$ a la derecha, $\vec{F_2} = 15\text{ N}$ a la izquierda y $\vec{F_3} = 5\text{ N}$ a la izquierda. ¿Está el sistema en equilibrio? Justifica.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un automóvil avanza por una autopista recta con velocidad constante de $90\text{ km/h}$. El motor empuja al auto con $1500\text{ N}$. ¿Cuánto vale la fuerza de roce total que se opone al movimiento? Justifica usando la 1ª Ley.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una caja de $200\text{ N}$ es sostenida por dos cuerdas <strong>verticales</strong> que parten del techo. Una soporta $80\text{ N}$. ¿Cuánto vale la tensión de la otra cuerda?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un patinador se desliza sobre hielo idealmente sin roce a $4\text{ m/s}$. Predice qué velocidad tendrá $30$ segundos después si nadie lo toca. Justifica.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> al frenar el bus bruscamente, un pasajero suelta un teléfono. ¿Hacia dónde y por qué se mueve el teléfono respecto al bus? Identifica además qué efecto de la fuerza ocurre sobre el cuerpo del pasajero (traslación, rotación o deformación).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Ingeniería inversa:</strong> sobre un cuerpo actúan tres fuerzas concurrentes. Dos son $\vec{F_1} = 30\text{ N}$ al norte y $\vec{F_2} = 40\text{ N}$ al este. Si el cuerpo se mantiene en equilibrio, determina módulo, dirección y sentido de $\vec{F_3}$.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Un camión se desplaza en línea recta sobre una carretera horizontal con <strong>velocidad constante</strong> de $20\text{ m/s}$.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            ¿Cuál de las siguientes afirmaciones es <strong>estrictamente correcta</strong> según la Primera Ley de Newton?
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) La fuerza neta sobre el camión es positiva, porque se mueve hacia adelante.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">B) La fuerza neta sobre el camión es proporcional a su velocidad.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">C) La fuerza neta sobre el camión es exactamente cero.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) Sobre el camión no actúa ninguna fuerza.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">A) Falsa:</span> moverse hacia adelante no implica fuerza neta. La fuerza está ligada al cambio de velocidad, no a la velocidad en sí.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">B) Falsa:</span> la fuerza neta es proporcional a la aceleración (2ª Ley), no a la velocidad.
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">C) Correcta:</span> al haber velocidad constante hay <strong>equilibrio dinámico</strong>. Por la 1ª Ley:
+                                $$ \vec{v} = \text{cte} \;\;\Longleftrightarrow\;\; \sum \vec{F} = 0 $$
+                                El motor empuja, pero el roce y el aire ejercen una fuerza igual y opuesta que la cancela.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">D) Falsa:</span> sí actúan fuerzas (peso, normal, motor, roce). Lo que vale cero es la <strong>suma</strong> vectorial de todas ellas.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 10: 1ª Ley de Newton — Inercia</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1-fuerzas') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2-ecuacion') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>

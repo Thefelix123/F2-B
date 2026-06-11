@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C9 — Descomposición Vectorial y Trigonometría</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                macros: { sen: "\\sin" }
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        @keyframes glow {
+            0%, 100% { filter: drop-shadow(0 0 2px currentColor); }
+            50% { filter: drop-shadow(0 0 8px currentColor); }
+        }
+        .glow { animation: glow 2s ease-in-out infinite; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="triangle" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="axis-3d" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Descomposición Vectorial<br>y Trigonometría
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    Cuando la fuerza no apunta donde la queremos
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C9</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">El Problema de la Cuerda Oblicua</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Una persona arrastra una maleta tirando de la correa, pero la correa no es horizontal: forma un ángulo con el suelo.
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">¿Toda la fuerza sirve para avanzar?</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                No. Una parte tira <strong>hacia adelante</strong> y otra parte tira <strong>hacia arriba</strong>. Si supieras cuánto vale cada parte, podrías predecir el movimiento con exactitud.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">La idea:</strong> toda fuerza oblicua puede separarse en dos fuerzas perpendiculares equivalentes. A eso lo llamamos <strong>descomponer un vector</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 440 300" class="w-full h-full" style="max-height:430px">
+                        <defs>
+                            <marker id="ahWh" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fff"/></marker>
+                            <marker id="ahEm" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                            <marker id="ahAm" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                        </defs>
+
+                        <!-- Suelo -->
+                        <line x1="20" y1="258" x2="420" y2="258" stroke="#64748b" stroke-width="3"/>
+                        <line x1="20" y1="265" x2="420" y2="265" stroke="#475569" stroke-width="2" stroke-dasharray="14,10"/>
+
+                        <!-- Maleta -->
+                        <rect x="70" y="198" width="90" height="60" fill="#475569" stroke="#cbd5e1" stroke-width="2" rx="7"/>
+                        <text x="115" y="233" font-size="13" fill="#fff" font-weight="bold" text-anchor="middle">MALETA</text>
+                        <circle cx="90" cy="260" r="7" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+                        <circle cx="140" cy="260" r="7" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+
+                        <!-- Componente horizontal (avanzar) -->
+                        <line x1="160" y1="213" x2="310" y2="213" stroke="#34d399" stroke-width="4.5" stroke-dasharray="6,5" marker-end="url(#ahEm)" class="vec-arrow"/>
+                        <text x="235" y="237" font-size="20" fill="#34d399" font-weight="bold" text-anchor="middle">Fₓ</text>
+
+                        <!-- Componente vertical (alivia peso) -->
+                        <line x1="310" y1="213" x2="310" y2="95" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="6,5" marker-end="url(#ahAm)" class="vec-arrow"/>
+                        <text x="333" y="158" font-size="20" fill="#fbbf24" font-weight="bold" text-anchor="middle">Fᵧ</text>
+
+                        <!-- Fuerza aplicada -->
+                        <line x1="160" y1="213" x2="310" y2="95" stroke="#fff" stroke-width="4.5" marker-end="url(#ahWh)" class="vec-arrow"/>
+                        <text x="232" y="135" font-size="26" fill="#fff" font-weight="900">F</text>
+
+                        <!-- Ángulo θ -->
+                        <path d="M 205 213 A 45 45 0 0 0 196 186" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                        <text x="212" y="201" font-size="18" fill="#f1f5f9" font-weight="bold">θ</text>
+
+                        <!-- Leyenda -->
+                        <text x="20" y="42" font-size="15" fill="#cbd5e1" font-weight="700">La misma fuerza F equivale a:</text>
+                        <text x="20" y="66" font-size="14" fill="#34d399" font-weight="600">→ Fₓ horizontal (la hace avanzar)</text>
+                        <text x="20" y="86" font-size="14" fill="#fbbf24" font-weight="600">→ Fᵧ vertical (alivia su peso)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: Componentes Rectangulares</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="glass-card p-5 border-t-[8px] border-indigo-600 shadow-md bg-white">
+                        <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                            Dado un vector $\vec{F}$ de módulo $F$ que forma un ángulo $\theta$ con el eje $x$, sus componentes rectangulares se obtienen proyectando sobre cada eje:
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center">
+                                <p class="text-xs uppercase tracking-widest font-bold text-emerald-700 mb-1">Componente horizontal</p>
+                                <p class="text-2xl font-mono font-black text-emerald-800">$$F_x = F \cdot \cos\theta$$</p>
+                            </div>
+                            <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-center">
+                                <p class="text-xs uppercase tracking-widest font-bold text-amber-700 mb-1">Componente vertical</p>
+                                <p class="text-2xl font-mono font-black text-amber-800">$$F_y = F \cdot \sen\theta$$</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 border-t-[8px] border-blue-600 shadow-md bg-white">
+                        <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                            Conocidas las componentes, podemos <strong>reconstruir</strong> el vector original: su módulo se obtiene por Pitágoras y su dirección por la función tangente.
+                        </p>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-center">
+                                <p class="text-xs uppercase tracking-widest font-bold text-blue-700 mb-1">Módulo</p>
+                                <p class="text-2xl font-mono font-black text-blue-800">$$F = \sqrt{F_x^{2} + F_y^{2}}$$</p>
+                            </div>
+                            <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-center">
+                                <p class="text-xs uppercase tracking-widest font-bold text-purple-700 mb-1">Ángulo</p>
+                                <p class="text-2xl font-mono font-black text-purple-800">$$\tan\theta = \frac{F_y}{F_x}$$</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100 border-2 border-slate-300 rounded-2xl p-4 text-sm text-slate-700">
+                        <p class="font-bold text-slate-800 mb-2">Valores trigonométricos clave (memorizar):</p>
+                        <div class="grid grid-cols-5 gap-2 text-center font-mono">
+                            <div class="bg-white rounded p-2"><span class="font-bold text-slate-500">θ</span></div>
+                            <div class="bg-white rounded p-2"><span class="font-bold">0°</span></div>
+                            <div class="bg-white rounded p-2"><span class="font-bold">30°</span></div>
+                            <div class="bg-white rounded p-2"><span class="font-bold">45°</span></div>
+                            <div class="bg-white rounded p-2"><span class="font-bold">60°</span></div>
+                            <div class="bg-white rounded p-2"><span class="font-bold text-emerald-700">cos</span></div>
+                            <div class="bg-white rounded p-2">$1$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{\sqrt{3}}{2}$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{\sqrt{2}}{2}$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{1}{2}$</div>
+                            <div class="bg-white rounded p-2"><span class="font-bold text-amber-700">sen</span></div>
+                            <div class="bg-white rounded p-2">$0$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{1}{2}$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{\sqrt{2}}{2}$</div>
+                            <div class="bg-white rounded p-2">$\tfrac{\sqrt{3}}{2}$</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card p-4 border-4 border-slate-200 shadow-md bg-white flex flex-col">
+                    <p class="text-lg text-slate-800 font-bold mb-3 text-center">Triángulo rectángulo de fuerzas</p>
+                    <div class="flex-1 bg-slate-900 rounded-2xl p-4 flex items-center justify-center min-h-[300px]">
+                        <svg viewBox="0 0 360 300" class="w-full h-full" style="max-height:330px">
+                            <defs>
+                                <marker id="ahInd3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#a5b4fc"/></marker>
+                                <marker id="ahEm3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                                <marker id="ahAm3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                            </defs>
+
+                            <!-- Relleno tenue del triángulo -->
+                            <polygon points="60,250 280,250 280,80" fill="#4f46e5" opacity="0.18"/>
+
+                            <!-- Ejes guía -->
+                            <line x1="60" y1="250" x2="335" y2="250" stroke="#475569" stroke-width="2"/>
+                            <line x1="60" y1="275" x2="60" y2="45" stroke="#475569" stroke-width="2"/>
+
+                            <!-- Componente horizontal (coseno) -->
+                            <line x1="60" y1="250" x2="280" y2="250" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahEm3)" class="vec-arrow"/>
+                            <text x="165" y="278" fill="#34d399" font-size="22" font-weight="bold" text-anchor="middle">Fₓ</text>
+
+                            <!-- Componente vertical (seno) -->
+                            <line x1="280" y1="250" x2="280" y2="80" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahAm3)" class="vec-arrow"/>
+                            <text x="305" y="170" fill="#fbbf24" font-size="22" font-weight="bold" text-anchor="middle">Fᵧ</text>
+
+                            <!-- Vector fuerza (hipotenusa) -->
+                            <line x1="60" y1="250" x2="280" y2="80" stroke="#818cf8" stroke-width="4.5" marker-end="url(#ahInd3)" class="vec-arrow"/>
+                            <text x="150" y="150" fill="#c7d2fe" font-size="28" font-weight="900">F</text>
+
+                            <!-- Ángulo θ -->
+                            <path d="M 110 250 A 50 50 0 0 0 99 222" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                            <text x="120" y="237" fill="#f1f5f9" font-size="20" font-weight="bold">θ</text>
+
+                            <!-- Ángulo recto -->
+                            <rect x="263" y="233" width="17" height="17" fill="none" stroke="#94a3b8" stroke-width="2"/>
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: Cuerda Inclinada a 60°</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Un trabajador jala un trineo con una cuerda que forma un ángulo de <strong class="text-purple-700">$\theta = 60°$</strong> con la horizontal. La tensión en la cuerda es <strong class="text-indigo-700">$F = 200\text{ N}$</strong>.
+                    <br><br>
+                    Determina las componentes horizontal y vertical de la fuerza aplicada al trineo.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[20rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1-datos', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Extraer Datos
+                        </button>
+                        <div id="paso1-datos" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <ul class="space-y-2 text-lg font-mono text-slate-700">
+                                <li><span class="font-bold text-slate-400">Fuerza aplicada:</span> $F = 200\text{ N}$</li>
+                                <li><span class="font-bold text-slate-400">Ángulo con la horizontal:</span> $\theta = 60°$</li>
+                                <li><span class="font-bold text-slate-400">Buscamos:</span> $F_x$ y $F_y$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2-ecs', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Aplicar Ecuaciones
+                        </button>
+                        <div id="paso2-ecs" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-sm font-bold text-emerald-600 uppercase tracking-widest mb-1">Componente horizontal</p>
+                            <p class="text-xl font-mono text-slate-800 mb-3">$$ F_x = F \cdot \cos\theta = 200 \cdot \cos 60° $$</p>
+                            <p class="text-sm font-bold text-amber-600 uppercase tracking-widest mb-1">Componente vertical</p>
+                            <p class="text-xl font-mono text-slate-800">$$ F_y = F \cdot \sen\theta = 200 \cdot \sen 60° $$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3-res', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Calcular
+                        </button>
+                        <div id="paso3-res" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-white p-3 rounded-lg border border-emerald-300">
+                                    <p class="text-xs uppercase font-bold text-emerald-600">Horizontal</p>
+                                    <p class="text-lg font-mono text-slate-800">$200 \cdot \tfrac{1}{2} = $</p>
+                                    <p class="text-2xl font-black text-emerald-700">$\mathbf{F_x = 100\text{ N}}$</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border border-amber-300">
+                                    <p class="text-xs uppercase font-bold text-amber-600">Vertical</p>
+                                    <p class="text-lg font-mono text-slate-800">$200 \cdot \tfrac{\sqrt{3}}{2} \approx$</p>
+                                    <p class="text-2xl font-black text-amber-700">$\mathbf{F_y \approx 173\text{ N}}$</p>
+                                </div>
+                            </div>
+                            <p class="text-sm italic text-slate-600 mt-3 text-center">Interpretación: 100 N empujan al trineo horizontalmente; 173 N tiran de él hacia arriba aliviando su peso aparente.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 290 290" class="w-full h-full" style="max-height:420px">
+                        <defs>
+                            <marker id="ahWh4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fff"/></marker>
+                            <marker id="ahEm4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                            <marker id="ahAm4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                        </defs>
+
+                        <!-- Relleno tenue del triángulo de fuerzas -->
+                        <polygon points="95,235 195,235 195,62" fill="#4f46e5" opacity="0.16"/>
+
+                        <!-- Suelo -->
+                        <line x1="15" y1="255" x2="275" y2="255" stroke="#64748b" stroke-width="3"/>
+
+                        <!-- Trineo -->
+                        <path d="M 28 246 L 100 246 L 96 226 L 36 226 Z" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M 26 250 Q 18 250 22 242" fill="none" stroke="#cbd5e1" stroke-width="2.5"/>
+                        <text x="64" y="241" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">trineo</text>
+
+                        <!-- Componente horizontal -->
+                        <line x1="95" y1="235" x2="195" y2="235" stroke="#34d399" stroke-width="4.5" stroke-dasharray="6,5" marker-end="url(#ahEm4)" class="vec-arrow"/>
+                        <text x="140" y="258" font-size="20" fill="#34d399" font-weight="bold" text-anchor="middle">Fₓ</text>
+
+                        <!-- Componente vertical -->
+                        <line x1="195" y1="235" x2="195" y2="62" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="6,5" marker-end="url(#ahAm4)" class="vec-arrow"/>
+                        <text x="216" y="150" font-size="20" fill="#fbbf24" font-weight="bold" text-anchor="middle">Fᵧ</text>
+
+                        <!-- Fuerza (tensión de la cuerda) -->
+                        <line x1="95" y1="235" x2="195" y2="62" stroke="#fff" stroke-width="4.5" marker-end="url(#ahWh4)" class="vec-arrow"/>
+                        <text x="118" y="48" font-size="17" fill="#fff" font-weight="900">F = 200 N</text>
+
+                        <!-- Ángulo 60° -->
+                        <path d="M 140 235 A 45 45 0 0 0 118 196" fill="none" stroke="#e2e8f0" stroke-width="3"/>
+                        <text x="128" y="222" font-size="15" fill="#f1f5f9" font-weight="bold">60°</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                Para cada ejercicio: dibuja el vector con su ángulo, identifica componentes y aplica $F_x = F\cos\theta$, $F_y = F\sen\theta$. Usa los valores exactos de la tabla cuando puedas.
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una fuerza de $F = 50\text{ N}$ forma $30°$ con la horizontal. Calcula $F_x$ y $F_y$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un vector de $80\text{ N}$ apunta a $45°$ sobre el eje $x$. Halla las componentes (puedes dejar $\sqrt{2}$ en la respuesta).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una fuerza tiene componentes $F_x = 6\text{ N}$ y $F_y = 8\text{ N}$. Determina su módulo total y el ángulo que forma con el eje $x$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un niño tira un carro con una cuerda a $37°$ con una fuerza de $100\text{ N}$. Si $\cos 37° = 0{,}8$ y $\sen 37° = 0{,}6$, ¿cuánto vale la componente horizontal que hace avanzar el carro?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Dos fuerzas actúan sobre un punto: $\vec{F_1} = 60\text{ N}$ horizontal y $\vec{F_2} = 50\text{ N}$ a $60°$. Descompón $\vec{F_2}$ y calcula la fuerza resultante neta sobre el punto (módulo).</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre un cuerpo actúa una fuerza de $200\text{ N}$ cuya componente vertical es $100\text{ N}$. Determina el ángulo de aplicación y la componente horizontal.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> a igual fuerza aplicada, ¿qué pasa con la componente horizontal cuando el ángulo aumenta de $0°$ hacia $90°$? Justifica usando $\cos\theta$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Suma vectorial general:</strong> $\vec{F_1} = 40\text{ N}$ a $30°$ y $\vec{F_2} = 60\text{ N}$ a $60°$. Descompón ambos, suma componentes y obtén el módulo de la resultante.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Sobre un cajón actúa una fuerza $\vec{F}$ de módulo $100\text{ N}$ aplicada con un ángulo $\theta = 30°$ sobre la horizontal. Considera $\cos 30° = \tfrac{\sqrt{3}}{2}$ y $\sen 30° = \tfrac{1}{2}$.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            ¿Cuál de las siguientes afirmaciones es <strong>estrictamente verdadera</strong>?
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) La componente horizontal vale $50\text{ N}$ y la vertical vale $50\sqrt{3}\text{ N}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">B) La componente horizontal vale $50\sqrt{3}\text{ N}$ y la vertical vale $50\text{ N}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">C) Ambas componentes valen $50\text{ N}$ por ser un ángulo simétrico.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) La componente vertical es nula porque la fuerza es casi horizontal.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">A) Falsa:</span> intercambia las funciones. La horizontal usa coseno, no seno.
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">B) Correcta:</span>
+                                $$ F_x = 100 \cdot \cos 30° = 100 \cdot \tfrac{\sqrt{3}}{2} = \mathbf{50\sqrt{3}\text{ N}} $$
+                                $$ F_y = 100 \cdot \sen 30° = 100 \cdot \tfrac{1}{2} = \mathbf{50\text{ N}} $$
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">C) Falsa:</span> la igualdad de componentes ocurre sólo a $45°$, no a $30°$.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">D) Falsa:</span> $\sen 30° = 0{,}5$, así que la vertical es del 50% del módulo, lejos de ser nula.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 9: Descomposición Vectorial y Trigonometría</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1-datos') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2-ecs') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>

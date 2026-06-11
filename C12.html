@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C12 — Tercera Ley de Newton: Acción y Reacción</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                macros: { sen: "\\sin" }
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        @keyframes flameFlicker {
+            0%, 100% { transform: scaleY(1); opacity: 0.95; }
+            50% { transform: scaleY(1.25); opacity: 0.75; }
+        }
+        .flame { animation: flameFlicker 0.5s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="repeat" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="arrow-left-right" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Tercera Ley de Newton<br>Acción y Reacción
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    Toda fuerza viene siempre en pareja
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C12</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">¿Cómo Avanza un Cohete en el Vacío?</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            En el espacio no hay aire ni suelo contra qué empujar. Sin embargo, un cohete acelera. ¿Contra qué se impulsa?
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">Contra sus propios gases</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                El motor <strong>empuja los gases hacia abajo</strong> (acción). Como respuesta, los gases <strong>empujan al cohete hacia arriba</strong> (reacción).
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">Idea clave:</strong> nunca existe una fuerza aislada. Si A empuja a B, entonces B empuja a A con la misma intensidad y en sentido contrario.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 320 380" class="w-full h-full" style="max-height:460px">
+                        <defs>
+                            <marker id="ahEm" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#34d399"/></marker>
+                            <marker id="ahRo" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#fb7185"/></marker>
+                        </defs>
+
+                        <!-- Estrellas -->
+                        <circle cx="40" cy="60" r="2" fill="#cbd5e1"/>
+                        <circle cx="280" cy="90" r="2.5" fill="#cbd5e1"/>
+                        <circle cx="70" cy="300" r="2" fill="#cbd5e1"/>
+                        <circle cx="270" cy="320" r="2" fill="#cbd5e1"/>
+                        <circle cx="250" cy="40" r="1.8" fill="#cbd5e1"/>
+
+                        <!-- Cohete -->
+                        <polygon points="150,40 128,95 172,95" fill="#e2e8f0" stroke="#94a3b8" stroke-width="2"/>
+                        <rect x="128" y="95" width="44" height="120" rx="4" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+                        <circle cx="150" cy="130" r="11" fill="#38bdf8" stroke="#0ea5e9" stroke-width="2"/>
+                        <polygon points="128,200 105,235 128,215" fill="#fb7185" stroke="#e11d48" stroke-width="1.5"/>
+                        <polygon points="172,200 195,235 172,215" fill="#fb7185" stroke="#e11d48" stroke-width="1.5"/>
+
+                        <!-- Llama -->
+                        <polygon class="flame" points="134,215 150,275 166,215" fill="#fbbf24" stroke="#f59e0b" stroke-width="1.5"/>
+
+                        <!-- Reacción: empuje sobre el cohete (arriba) -->
+                        <line x1="222" y1="170" x2="222" y2="80" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahEm)" class="vec-arrow"/>
+                        <text x="230" y="120" font-size="15" fill="#6ee7b7" font-weight="bold">Reacción</text>
+                        <text x="230" y="138" font-size="12" fill="#a7f3d0">(en el cohete)</text>
+
+                        <!-- Acción: empuje sobre los gases (abajo) -->
+                        <line x1="150" y1="285" x2="150" y2="350" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahRo)" class="vec-arrow"/>
+                        <text x="160" y="330" font-size="15" fill="#fda4af" font-weight="bold">Acción</text>
+                        <text x="160" y="348" font-size="12" fill="#fecdd3">(sobre los gases)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: El Par Acción-Reacción</h2>
+            </div>
+
+            <div class="flex flex-col gap-5 flex-1">
+
+                <div class="glass-card p-6 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white shrink-0">
+                    <p class="text-sm uppercase tracking-widest font-bold text-indigo-700 mb-2">Enunciado formal</p>
+                    <p class="text-lg text-slate-800 leading-relaxed font-medium text-center max-w-5xl mb-3">
+                        Cuando un cuerpo A ejerce una fuerza sobre un cuerpo B, el cuerpo B ejerce simultáneamente sobre A una fuerza de <strong>igual módulo</strong>, <strong>igual dirección</strong> y <strong>sentido opuesto</strong>.
+                    </p>
+                    <div class="bg-indigo-50 px-8 py-3 rounded-2xl text-3xl text-center text-indigo-800 font-black border border-indigo-200 shadow-inner">
+                        $$ \vec{F}_{A \to B} = -\,\vec{F}_{B \to A} $$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-5 flex-1">
+
+                    <div class="col-span-5 glass-card p-4 border-4 border-slate-200 shadow-md bg-white flex flex-col">
+                        <p class="text-base text-slate-800 font-bold mb-2 text-center">Dos cuerpos, dos fuerzas</p>
+                        <div class="flex-1 bg-slate-900 rounded-2xl p-3 flex items-center justify-center min-h-[230px]">
+                            <svg viewBox="0 0 320 220" class="w-full h-full" style="max-height:250px">
+                                <defs>
+                                    <marker id="ahB" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#60a5fa"/></marker>
+                                    <marker id="ahA" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#fbbf24"/></marker>
+                                </defs>
+
+                                <rect x="40" y="80" width="70" height="70" rx="8" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2.5"/>
+                                <text x="75" y="122" font-size="26" fill="#bfdbfe" font-weight="900" text-anchor="middle">A</text>
+
+                                <rect x="210" y="80" width="70" height="70" rx="8" fill="#78350f" stroke="#fbbf24" stroke-width="2.5"/>
+                                <text x="245" y="122" font-size="26" fill="#fde68a" font-weight="900" text-anchor="middle">B</text>
+
+                                <line x1="115" y1="100" x2="205" y2="100" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahB)" class="vec-arrow"/>
+                                <text x="160" y="92" font-size="13" fill="#93c5fd" font-weight="bold" text-anchor="middle">F (A→B)</text>
+
+                                <line x1="205" y1="132" x2="115" y2="132" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahA)" class="vec-arrow"/>
+                                <text x="160" y="152" font-size="13" fill="#fde68a" font-weight="bold" text-anchor="middle">F (B→A)</text>
+
+                                <text x="160" y="195" font-size="13" fill="#cbd5e1" text-anchor="middle" font-style="italic">mismo módulo, sentidos opuestos</text>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="col-span-7 grid grid-rows-2 gap-5">
+                        <div class="glass-card p-5 border-l-8 border-emerald-500 shadow-md bg-white flex flex-col justify-center">
+                            <p class="text-xl font-extrabold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-600"></i> Características del par</p>
+                            <ul class="text-base text-slate-700 space-y-1.5 font-medium">
+                                <li>• Tienen <strong>igual módulo</strong> y actúan sobre la <strong>misma recta</strong>.</li>
+                                <li>• Apuntan en <strong>sentidos opuestos</strong>.</li>
+                                <li>• Son <strong>simultáneas</strong>: aparecen y desaparecen juntas.</li>
+                            </ul>
+                        </div>
+                        <div class="glass-card p-5 border-l-8 border-rose-500 shadow-md bg-rose-50/40 flex flex-col justify-center">
+                            <p class="text-xl font-extrabold text-slate-900 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-6 h-6 text-rose-600"></i> ¿Por qué NO se anulan?</p>
+                            <p class="text-base text-slate-700 font-medium leading-relaxed">
+                                Porque actúan sobre <strong class="text-rose-700">cuerpos diferentes</strong>. Para que dos fuerzas se cancelen deben actuar sobre el <strong>mismo</strong> cuerpo. Acción y reacción nunca están sobre el mismo objeto.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: Dos Patinadores se Empujan</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Sobre hielo sin roce, la patinadora <strong class="text-blue-700">A ($60\text{ kg}$)</strong> empuja al patinador <strong class="text-amber-700">B ($40\text{ kg}$)</strong> con una fuerza de <strong>$120\text{ N}$</strong>.
+                    <br><br>
+                    <strong>A)</strong> ¿Qué fuerza recibe A de parte de B?<br>
+                    <strong>B)</strong> ¿Qué aceleración adquiere cada uno?
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[20rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Aplicar 3ª Ley (fuerzas)
+                        </button>
+                        <div id="paso1" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-lg text-slate-700 font-medium mb-2">Por acción-reacción, la fuerza es la misma en módulo:</p>
+                            <p class="text-xl font-mono text-slate-900 font-black text-center">$F_{A\to B} = F_{B\to A} = \mathbf{120\text{ N}}$</p>
+                            <p class="text-sm italic text-slate-600 mt-2 text-center">B recibe 120 N hacia la derecha; A recibe 120 N hacia la izquierda.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Aceleración de cada uno (2ª Ley)
+                        </button>
+                        <div id="paso2" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200 text-center">
+                                    <p class="text-xs uppercase font-bold text-blue-600">Patinadora A</p>
+                                    <p class="text-lg font-mono text-slate-800">$a_A = \dfrac{120}{60}$</p>
+                                </div>
+                                <div class="bg-amber-50 p-3 rounded-lg border border-amber-200 text-center">
+                                    <p class="text-xs uppercase font-bold text-amber-600">Patinador B</p>
+                                    <p class="text-lg font-mono text-slate-800">$a_B = \dfrac{120}{40}$</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Interpretar
+                        </button>
+                        <div id="paso3" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <div class="grid grid-cols-2 gap-4 mb-2">
+                                <p class="text-xl font-mono text-blue-700 font-black text-center">$a_A = 2\text{ m/s}^2$</p>
+                                <p class="text-xl font-mono text-amber-700 font-black text-center">$a_B = 3\text{ m/s}^2$</p>
+                            </div>
+                            <p class="text-sm italic text-slate-600 text-center">Igual fuerza, pero B (más liviano) acelera más. La fuerza es la misma; el efecto depende de la masa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 320 240" class="w-full h-full" style="max-height:430px">
+                        <defs>
+                            <marker id="ahBl4" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#60a5fa"/></marker>
+                            <marker id="ahAm4" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#fbbf24"/></marker>
+                        </defs>
+
+                        <!-- Hielo -->
+                        <line x1="15" y1="180" x2="305" y2="180" stroke="#67e8f9" stroke-width="2.5"/>
+                        <text x="160" y="200" font-size="12" fill="#94a3b8" font-style="italic" text-anchor="middle">hielo sin roce</text>
+
+                        <!-- Patinadora A -->
+                        <circle cx="95" cy="95" r="14" fill="#60a5fa"/>
+                        <rect x="86" y="109" width="18" height="40" rx="4" fill="#60a5fa"/>
+                        <text x="95" y="172" font-size="14" fill="#bfdbfe" font-weight="900" text-anchor="middle">A · 60 kg</text>
+
+                        <!-- Patinador B -->
+                        <circle cx="225" cy="95" r="12" fill="#fbbf24"/>
+                        <rect x="217" y="107" width="16" height="36" rx="4" fill="#fbbf24"/>
+                        <text x="225" y="172" font-size="14" fill="#fde68a" font-weight="900" text-anchor="middle">B · 40 kg</text>
+
+                        <!-- Manos en contacto -->
+                        <line x1="104" y1="120" x2="217" y2="120" stroke="#475569" stroke-width="2" stroke-dasharray="4,4"/>
+
+                        <!-- F sobre B (derecha) -->
+                        <line x1="160" y1="105" x2="212" y2="105" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahBl4)" class="vec-arrow"/>
+                        <text x="178" y="98" font-size="12" fill="#93c5fd" font-weight="bold" text-anchor="middle">120 N</text>
+
+                        <!-- F sobre A (izquierda) -->
+                        <line x1="160" y1="135" x2="108" y2="135" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahAm4)" class="vec-arrow"/>
+                        <text x="142" y="150" font-size="12" fill="#fde68a" font-weight="bold" text-anchor="middle">120 N</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                En cada caso identifica el <strong>par acción-reacción</strong> (sobre qué cuerpos actúa) y, cuando se pida, combina con la 2ª Ley para hallar aceleraciones.
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un martillo golpea un clavo con $80\text{ N}$. ¿Con qué fuerza empuja el clavo al martillo? Indica sobre qué cuerpo actúa cada fuerza.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Al caminar, tu pie empuja el suelo hacia atrás con $200\text{ N}$. Identifica la fuerza de reacción y explica qué te hace avanzar.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un nadador empuja el agua hacia atrás con $150\text{ N}$. ¿Cuál es el módulo y el sentido de la fuerza que el agua ejerce sobre el nadador?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un astronauta de $80\text{ kg}$ empuja una cápsula con $160\text{ N}$. Determina la aceleración del astronauta producida por la fuerza de reacción.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Dos niños en patines se empujan: A ($50\text{ kg}$) y B ($25\text{ kg}$). Si A acelera a $2\text{ m/s}^2$, ¿qué fuerza actúa entre ellos y qué aceleración adquiere B?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un libro de $12\text{ N}$ descansa sobre una mesa. Nombra el par acción-reacción entre libro y Tierra, y explica por qué la normal de la mesa <em>no</em> es la reacción al peso.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> un caballo tira de una carreta. La carreta tira del caballo con igual fuerza (3ª Ley). Si las fuerzas son iguales y opuestas, ¿por qué el conjunto avanza? Justifica con las fuerzas externas sobre cada cuerpo.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Ingeniería inversa:</strong> un cañón de $500\text{ kg}$ dispara una bala de $5\text{ kg}$ que sale a $400\text{ m/s}$. Durante el disparo la fuerza dura $0{,}02\text{ s}$. Determina la fuerza media sobre la bala y la velocidad de retroceso del cañón.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Un camión de gran masa choca de frente con un pequeño mosquito, que queda aplastado en el parabrisas.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            Respecto de las fuerzas durante el impacto, ¿cuál afirmación es <strong>estrictamente correcta</strong>?
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) El camión ejerce más fuerza sobre el mosquito que el mosquito sobre el camión.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">B) Ambas fuerzas tienen igual módulo, pero el mosquito sufre una aceleración mucho mayor.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">C) Solo el camión ejerce fuerza; el mosquito no ejerce ninguna.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) Las fuerzas son iguales, por lo tanto ambos sufren la misma aceleración.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">B) Correcta:</span> por la 3ª Ley, las fuerzas del par son iguales en módulo:
+                                $$ F_{\text{camión}\to\text{mosquito}} = F_{\text{mosquito}\to\text{camión}} $$
+                                Pero por la 2ª Ley $a = F/m$: como la masa del mosquito es minúscula, su aceleración es enorme (por eso se destruye), mientras el camión casi no cambia su velocidad.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">A y C Falsas:</span> la fuerza nunca es "mayor" en un lado; el par acción-reacción siempre tiene igual módulo. Ambos cuerpos ejercen fuerza.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">D) Falsa:</span> fuerzas iguales NO implican aceleraciones iguales, porque las masas son muy distintas.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 12: 3ª Ley de Newton — Acción y Reacción</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>

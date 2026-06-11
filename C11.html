@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C11 — Segunda Ley de Newton: F = ma</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                macros: { sen: "\\sin" }
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        @keyframes pushFast {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(160px); }
+        }
+        @keyframes pushSlow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50px); }
+        }
+        .anim-fast { animation: pushFast 2.5s ease-in infinite alternate; }
+        .anim-slow { animation: pushSlow 2.5s ease-in infinite alternate; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="weight" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="arrow-big-right-dash" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Segunda Ley de Newton<br>El Principio de Masa
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    Cuando la fuerza neta no es cero
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C11</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Dos Carritos, Una Misma Fuerza</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Empujas un carrito de supermercado <strong>vacío</strong> con cierta fuerza y arranca rápido. Luego empujas exactamente igual el mismo carrito <strong>lleno</strong> y apenas se mueve.
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">¿Por qué la diferencia?</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                Misma fuerza, distinta masa. A mayor masa, <strong>menor aceleración</strong>. Esa relación es justamente la <strong class="text-indigo-700">Segunda Ley de Newton</strong>.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">Idea clave:</strong> la fuerza neta no causa <em>velocidad</em>; causa <em>cambio de velocidad</em>, es decir, <strong>aceleración</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex flex-col p-4 gap-2">
+                    <div class="flex-1 relative border-b border-slate-700">
+                        <div class="text-xs uppercase tracking-widest font-bold text-emerald-400 absolute top-2 left-3 z-10">Carrito vacío · masa pequeña · aceleración grande</div>
+                        <svg viewBox="0 0 400 110" class="w-full h-full">
+                            <line x1="0" y1="95" x2="400" y2="95" stroke="#475569" stroke-width="2"/>
+                            <g class="anim-fast">
+                                <rect x="20" y="60" width="60" height="30" fill="#34d399" stroke="#10b981" stroke-width="2" rx="3"/>
+                                <circle cx="35" cy="92" r="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+                                <circle cx="65" cy="92" r="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+                            </g>
+                            <text x="298" y="52" font-size="16" fill="#34d399" font-weight="800">a grande →</text>
+                        </svg>
+                    </div>
+                    <div class="flex-1 relative">
+                        <div class="text-xs uppercase tracking-widest font-bold text-rose-400 absolute top-2 left-3 z-10">Carrito lleno · masa grande · aceleración pequeña</div>
+                        <svg viewBox="0 0 400 110" class="w-full h-full">
+                            <line x1="0" y1="95" x2="400" y2="95" stroke="#475569" stroke-width="2"/>
+                            <g class="anim-slow">
+                                <rect x="20" y="40" width="60" height="50" fill="#fb7185" stroke="#e11d48" stroke-width="2" rx="3"/>
+                                <rect x="28" y="20" width="44" height="20" fill="#fda4af" stroke="#e11d48" stroke-width="1.5" rx="2"/>
+                                <circle cx="35" cy="92" r="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+                                <circle cx="65" cy="92" r="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+                            </g>
+                            <text x="288" y="52" font-size="16" fill="#fb7185" font-weight="800">a pequeña →</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: $\vec{F} = m \cdot \vec{a}$</h2>
+            </div>
+
+            <div class="flex flex-col gap-5 flex-1">
+
+                <div class="glass-card p-6 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white shrink-0">
+                    <p class="text-sm uppercase tracking-widest font-bold text-indigo-700 mb-2">Enunciado formal</p>
+                    <p class="text-lg text-slate-800 leading-relaxed font-medium text-center max-w-5xl mb-3">
+                        La fuerza neta que actúa sobre un cuerpo es <strong>directamente proporcional a la aceleración</strong> que adquiere e <strong>inversamente proporcional a su masa</strong>. Su dirección coincide con la de la fuerza neta.
+                    </p>
+                    <div class="bg-indigo-50 px-8 py-3 rounded-2xl text-3xl text-center text-indigo-800 font-black border border-indigo-200 shadow-inner">
+                        $$ \sum \vec{F} = m \cdot \vec{a} $$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-5 flex-1">
+
+                    <div class="glass-card p-5 border-t-8 border-blue-500 shadow-md bg-white flex flex-col">
+                        <p class="text-lg font-extrabold text-slate-900 mb-2">Fuerza neta</p>
+                        <p class="text-sm text-slate-600 mb-3">Suma vectorial de todas las fuerzas que actúan sobre el cuerpo.</p>
+                        <div class="bg-blue-50 px-3 py-2 rounded-xl text-center border border-blue-200 mt-auto">
+                            <p class="text-xl font-mono font-black text-blue-700">$$ F = m \cdot a $$</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 border-t-8 border-emerald-500 shadow-md bg-white flex flex-col">
+                        <p class="text-lg font-extrabold text-slate-900 mb-2">Aceleración</p>
+                        <p class="text-sm text-slate-600 mb-3">A mayor fuerza neta, mayor aceleración (manteniendo la masa fija).</p>
+                        <div class="bg-emerald-50 px-3 py-2 rounded-xl text-center border border-emerald-200 mt-auto">
+                            <p class="text-xl font-mono font-black text-emerald-700">$$ a = \frac{F}{m} $$</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 border-t-8 border-rose-500 shadow-md bg-white flex flex-col">
+                        <p class="text-lg font-extrabold text-slate-900 mb-2">Masa</p>
+                        <p class="text-sm text-slate-600 mb-3">Mide la <strong>inercia</strong> del cuerpo: su resistencia a cambiar de velocidad.</p>
+                        <div class="bg-rose-50 px-3 py-2 rounded-xl text-center border border-rose-200 mt-auto">
+                            <p class="text-xl font-mono font-black text-rose-700">$$ m = \frac{F}{a} $$</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-sm">
+                        <p class="text-sm font-bold text-slate-800 mb-2 uppercase tracking-widest">Unidad de fuerza en S.I.</p>
+                        <p class="text-base text-slate-700">$1$ Newton es la fuerza neta que aplicada sobre $1\text{ kg}$ produce una aceleración de $1\text{ m/s}^2$.</p>
+                        <div class="bg-slate-50 px-4 py-2 rounded-xl text-center border border-slate-300 mt-2">
+                            <p class="text-lg font-mono font-black text-slate-800">$1\text{ N} = 1\,\frac{\text{kg}\cdot\text{m}}{\text{s}^2}$</p>
+                        </div>
+                    </div>
+                    <div class="bg-white border-2 border-slate-200 rounded-2xl p-4 shadow-sm">
+                        <p class="text-sm font-bold text-slate-800 mb-2 uppercase tracking-widest">Relación con la 1ª Ley</p>
+                        <p class="text-base text-slate-700">Si $\sum \vec{F} = 0$, entonces $\vec{a} = 0$. La Primera Ley es un <strong>caso particular</strong> de la Segunda.</p>
+                        <div class="bg-amber-50 px-4 py-2 rounded-xl text-center border border-amber-300 mt-2">
+                            <p class="text-sm font-mono font-bold text-amber-700">No hay fuerza neta $\Rightarrow$ velocidad constante</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: Bloque con Roce</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Sobre una caja de <strong class="text-indigo-700">$m = 4\text{ kg}$</strong> que se desliza sobre una superficie horizontal se aplica una fuerza de empuje de <strong class="text-blue-700">$F_{\text{aplicada}} = 30\text{ N}$</strong> hacia la derecha. La superficie ejerce una fuerza de roce de <strong class="text-rose-600">$F_{\text{roce}} = 10\text{ N}$</strong> en sentido contrario.
+                    <br><br>
+                    Determina la <strong>aceleración</strong> con la que se mueve la caja.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[20rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1-datos', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Calcular Fuerza Neta
+                        </button>
+                        <div id="paso1-datos" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">Fuerzas horizontales (sentidos opuestos)</p>
+                            <p class="text-lg font-mono text-slate-800 mb-2">$F_{\text{neta}} = F_{\text{aplicada}} - F_{\text{roce}}$</p>
+                            <p class="text-lg font-mono text-slate-800 mb-2">$F_{\text{neta}} = 30 - 10$</p>
+                            <p class="text-xl font-mono text-slate-900 font-black text-center">$\mathbf{F_{\text{neta}} = 20\text{ N}}$ (a la derecha)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2-ec', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Aplicar 2ª Ley
+                        </button>
+                        <div id="paso2-ec" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-2">Segunda Ley de Newton</p>
+                            <p class="text-xl font-mono text-slate-800 text-center mb-2">$$ F_{\text{neta}} = m \cdot a $$</p>
+                            <p class="text-xl font-mono text-slate-800 text-center">Despejando: $\;\; a = \dfrac{F_{\text{neta}}}{m}$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3-resp', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Sustituir y Calcular
+                        </button>
+                        <div id="paso3-resp" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-xl font-mono text-slate-800 text-center mb-2">$a = \dfrac{20\text{ N}}{4\text{ kg}}$</p>
+                            <p class="text-2xl font-mono text-emerald-700 font-extrabold text-center">$\mathbf{a = 5\text{ m/s}^2}$ (hacia la derecha)</p>
+                            <p class="text-sm italic text-slate-600 mt-2 text-center">La caja acelera a 5 m/s² en el mismo sentido que la fuerza neta.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 320 240" class="w-full h-full" style="max-height:430px">
+                        <defs>
+                            <marker id="ahBl6" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#60a5fa"/></marker>
+                            <marker id="ahRo6" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fb7185"/></marker>
+                            <marker id="ahEm6" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                            <pattern id="hatch" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
+                                <line x1="0" y1="0" x2="0" y2="10" stroke="#475569" stroke-width="2"/>
+                            </pattern>
+                        </defs>
+
+                        <line x1="20" y1="172" x2="300" y2="172" stroke="#94a3b8" stroke-width="2.5"/>
+                        <rect x="20" y="172" width="280" height="14" fill="url(#hatch)" opacity="0.7"/>
+
+                        <rect x="108" y="108" width="84" height="64" fill="#475569" stroke="#cbd5e1" stroke-width="2" rx="5"/>
+                        <text x="150" y="146" font-size="16" font-weight="bold" fill="#fff" text-anchor="middle">4 kg</text>
+
+                        <!-- Fuerza aplicada -->
+                        <line x1="192" y1="140" x2="284" y2="140" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahBl6)" class="vec-arrow"/>
+                        <text x="238" y="128" font-size="15" font-weight="800" fill="#93c5fd" text-anchor="middle">F = 30 N</text>
+
+                        <!-- Roce -->
+                        <line x1="108" y1="140" x2="78" y2="140" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahRo6)" class="vec-arrow"/>
+                        <text x="55" y="128" font-size="15" font-weight="800" fill="#fda4af" text-anchor="middle">Fr = 10 N</text>
+
+                        <!-- Aceleración resultante -->
+                        <line x1="130" y1="78" x2="210" y2="78" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahEm6)" class="vec-arrow"/>
+                        <text x="168" y="66" font-size="17" font-weight="900" fill="#6ee7b7" text-anchor="middle">a = 5 m/s²</text>
+
+                        <text x="160" y="222" font-size="12" fill="#94a3b8" font-style="italic" text-anchor="middle">Diagrama de cuerpo libre (vista horizontal)</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                Aplica el método: <strong>Datos → Fuerza neta → 2ª Ley → Despeje</strong>. Cuida que las unidades sean S.I. (kg, m/s², N).
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre un bloque de $2\text{ kg}$ se aplica una fuerza neta de $10\text{ N}$. Calcula la aceleración.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una pelota de $0{,}5\text{ kg}$ acelera a $6\text{ m/s}^2$ cuando alguien la patea. ¿Qué fuerza neta recibió?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un carrito acelera a $2\text{ m/s}^2$ cuando se le aplica una fuerza neta de $14\text{ N}$. Determina su masa.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una caja de $5\text{ kg}$ recibe una fuerza horizontal de $25\text{ N}$ a la derecha y una de roce de $5\text{ N}$ a la izquierda. Determina la aceleración resultante.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un automóvil de $1000\text{ kg}$ parte del reposo y alcanza $20\text{ m/s}$ en $10\text{ s}$. Calcula la fuerza neta del motor sobre el auto. (<em>Pista: primero calcula la aceleración</em>)</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">A un bloque de $3\text{ kg}$ se le aplican simultáneamente $\vec{F_1} = 12\text{ N}$ a la derecha y $\vec{F_2} = 9\text{ N}$ perpendicular (hacia arriba). Calcula el módulo de la aceleración resultante.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> si se duplica la fuerza aplicada sobre un cuerpo y al mismo tiempo se duplica su masa, ¿cómo cambia la aceleración? Justifica usando $a = F/m$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Ingeniería inversa:</strong> sobre un cuerpo actúa una fuerza neta constante. Con su masa original adquiere una aceleración de $6\text{ m/s}^2$; al agregarle $2\text{ kg}$, su aceleración baja a $4\text{ m/s}^2$. Determina la masa original y el valor de la fuerza neta.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Sobre un cuerpo de masa $m$ actúa una fuerza neta $F$ que le produce una aceleración $a$.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            Si la fuerza neta se <strong>triplica</strong> y la masa se <strong>reduce a la mitad</strong>, la nueva aceleración del cuerpo será:
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) $\;3a$</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">B) $\;6a$</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">C) $\;\tfrac{3}{2}a$</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) $\;\tfrac{a}{6}$</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">Situación inicial:</span>
+                                $$ a = \frac{F}{m} $$
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">B) Correcta:</span>
+                                Reemplazamos $F \to 3F$ y $m \to \tfrac{m}{2}$:
+                                $$ a' = \frac{3F}{\tfrac{m}{2}} = \frac{3F \cdot 2}{m} = \mathbf{6 \cdot \frac{F}{m} = 6a} $$
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">A, C, D Falsas:</span> ignoran uno de los dos factores. La aceleración cambia por el efecto combinado: $\times 3$ por la fuerza y $\times 2$ por la reducción de masa.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 11: 2ª Ley de Newton — F = ma</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1-datos') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2-ec') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C8 — Concepto de Fuerza y Vectores</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        @keyframes pulseVec {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        .pulse-vec { animation: pulseVec 1.6s ease-in-out infinite; transform-origin: center; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="move" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="move-3d" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Concepto de Fuerza<br>y Magnitudes Vectoriales
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    Apertura del Bloque de Dinámica
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C8</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Empujar, Tirar, Deformar</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Hasta ahora estudiamos el movimiento <strong>describiendo</strong> qué ocurría: posición, velocidad, aceleración. Pero nunca preguntamos por la <strong>causa</strong>.
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">¿Por qué un objeto se mueve, frena o se deforma?</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                La respuesta es siempre la misma: porque <strong>otro cuerpo</strong> interactúa con él. A esa interacción la llamamos <strong class="text-indigo-700">fuerza</strong>.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">Idea clave:</strong> una fuerza nunca aparece sola. Siempre hay un cuerpo que la ejerce y otro que la recibe.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 grid grid-cols-2 gap-6">
+                    <div class="glass-card p-5 border-t-8 border-blue-500 bg-white flex flex-col items-center justify-center text-center">
+                        <i data-lucide="hand" class="w-16 h-16 text-blue-600 mb-3"></i>
+                        <p class="text-lg font-bold text-slate-800">Contacto Directo</p>
+                        <p class="text-sm text-slate-600 mt-1">Empujar una caja, golpear una pelota, tensar una cuerda.</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-8 border-rose-500 bg-white flex flex-col items-center justify-center text-center">
+                        <i data-lucide="globe" class="w-16 h-16 text-rose-600 mb-3"></i>
+                        <p class="text-lg font-bold text-slate-800">Acción a Distancia</p>
+                        <p class="text-sm text-slate-600 mt-1">Gravedad, magnetismo y electricidad actúan sin tocar el cuerpo.</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-8 border-emerald-500 bg-white flex flex-col items-center justify-center text-center">
+                        <i data-lucide="move-right" class="w-16 h-16 text-emerald-600 mb-3"></i>
+                        <p class="text-lg font-bold text-slate-800">Cambia el Movimiento</p>
+                        <p class="text-sm text-slate-600 mt-1">Acelera, frena o desvía la trayectoria del cuerpo.</p>
+                    </div>
+                    <div class="glass-card p-5 border-t-8 border-purple-500 bg-white flex flex-col items-center justify-center text-center">
+                        <i data-lucide="shapes" class="w-16 h-16 text-purple-600 mb-3"></i>
+                        <p class="text-lg font-bold text-slate-800">Deforma o Rompe</p>
+                        <p class="text-sm text-slate-600 mt-1">Comprime un resorte, dobla una barra, quiebra un vidrio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: La Fuerza como Vector</h2>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6 flex-1">
+                <div class="glass-card p-6 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white shrink-0">
+                    <p class="text-xl text-slate-700 leading-relaxed font-medium mb-4 text-center max-w-5xl">
+                        Una <strong>fuerza</strong> es una magnitud <strong class="text-indigo-700">vectorial</strong> que mide la interacción capaz de modificar el estado de movimiento o la forma de un cuerpo. Se representa con el símbolo $\vec{F}$ y su unidad en el S.I. es el <strong>Newton</strong>.
+                    </p>
+                    <div class="bg-indigo-50 px-8 py-4 rounded-3xl text-2xl text-center text-indigo-800 font-black border border-indigo-200 shadow-inner">
+                        $$ 1\text{ N} = 1\,\frac{\text{kg} \cdot \text{m}}{\text{s}^{2}} $$
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 gap-6 h-full">
+                    <div class="col-span-5 glass-card p-6 border-l-8 border-indigo-500 bg-white shadow-md flex flex-col">
+                        <p class="text-2xl font-extrabold text-slate-900 mb-4 border-b-2 border-slate-100 pb-3">Cuatro elementos de un vector</p>
+                        <ul class="text-lg text-slate-700 space-y-4 font-medium">
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full font-extrabold text-sm shrink-0 mt-1">1</span>
+                                <span><strong class="text-indigo-700">Módulo:</strong> el "tamaño" o intensidad, expresado en Newton.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full font-extrabold text-sm shrink-0 mt-1">2</span>
+                                <span><strong class="text-indigo-700">Dirección:</strong> la recta sobre la cual actúa (horizontal, vertical, etc.).</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full font-extrabold text-sm shrink-0 mt-1">3</span>
+                                <span><strong class="text-indigo-700">Sentido:</strong> hacia dónde apunta la flecha sobre esa recta.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-700 rounded-full font-extrabold text-sm shrink-0 mt-1">4</span>
+                                <span><strong class="text-indigo-700">Punto de aplicación:</strong> dónde se ejerce sobre el cuerpo.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="col-span-7 glass-card p-4 border-4 border-slate-200 shadow-md bg-white flex flex-col">
+                        <p class="text-xl text-slate-800 font-bold mb-2 text-center">Resultante para tres ángulos clave</p>
+                        <div class="grid grid-cols-3 gap-4 flex-1">
+
+                            <div class="border-2 border-emerald-200 rounded-2xl p-3 bg-emerald-50 flex flex-col items-center">
+                                <p class="text-sm font-extrabold text-emerald-700 uppercase tracking-widest">0°</p>
+                                <p class="text-xs text-slate-600 text-center mb-2">Misma dirección y sentido</p>
+                                <div class="bg-slate-900 rounded-xl w-full h-28 flex items-center justify-center p-2 mb-2">
+                                    <svg viewBox="0 0 180 110" class="w-full h-full">
+                                        <defs>
+                                            <marker id="ahE" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#34d399"/></marker>
+                                            <marker id="ahER" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#6ee7b7"/></marker>
+                                        </defs>
+                                        <line x1="14" y1="26" x2="69" y2="26" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahE)" class="vec-arrow"/>
+                                        <text x="38" y="18" font-size="13" font-weight="bold" fill="#6ee7b7">F₁</text>
+                                        <line x1="14" y1="52" x2="114" y2="52" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahE)" class="vec-arrow"/>
+                                        <text x="64" y="44" font-size="13" font-weight="bold" fill="#6ee7b7">F₂</text>
+                                        <line x1="14" y1="86" x2="159" y2="86" stroke="#6ee7b7" stroke-width="4.5" marker-end="url(#ahER)" class="vec-arrow"/>
+                                        <text x="80" y="104" font-size="13" font-weight="900" fill="#a7f3d0" text-anchor="middle">R</text>
+                                    </svg>
+                                </div>
+                                <div class="bg-white px-3 py-1 rounded-lg border border-emerald-300">
+                                    <span class="text-sm font-mono font-extrabold text-emerald-700">$R = F_1 + F_2$</span>
+                                </div>
+                            </div>
+
+                            <div class="border-2 border-indigo-200 rounded-2xl p-3 bg-indigo-50 flex flex-col items-center">
+                                <p class="text-sm font-extrabold text-indigo-700 uppercase tracking-widest">90°</p>
+                                <p class="text-xs text-slate-600 text-center mb-2">Perpendiculares</p>
+                                <div class="bg-slate-900 rounded-xl w-full h-28 flex items-center justify-center p-2 mb-2">
+                                    <svg viewBox="0 0 180 110" class="w-full h-full">
+                                        <defs>
+                                            <marker id="ahI" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#818cf8"/></marker>
+                                            <marker id="ahIR" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#c7d2fe"/></marker>
+                                        </defs>
+                                        <polygon points="45,90 130,90 130,22" fill="#4f46e5" opacity="0.18"/>
+                                        <line x1="45" y1="90" x2="130" y2="90" stroke="#818cf8" stroke-width="4.5" marker-end="url(#ahI)" class="vec-arrow"/>
+                                        <text x="86" y="104" font-size="13" font-weight="bold" fill="#c7d2fe" text-anchor="middle">F₁</text>
+                                        <line x1="45" y1="90" x2="45" y2="22" stroke="#818cf8" stroke-width="4.5" marker-end="url(#ahI)" class="vec-arrow"/>
+                                        <text x="26" y="52" font-size="13" font-weight="bold" fill="#c7d2fe">F₂</text>
+                                        <line x1="45" y1="90" x2="130" y2="22" stroke="#c7d2fe" stroke-width="4.5" marker-end="url(#ahIR)" class="vec-arrow"/>
+                                        <text x="92" y="44" font-size="13" font-weight="900" fill="#e0e7ff">R</text>
+                                        <rect x="116" y="76" width="14" height="14" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+                                    </svg>
+                                </div>
+                                <div class="bg-white px-3 py-1 rounded-lg border border-indigo-300">
+                                    <span class="text-sm font-mono font-extrabold text-indigo-700">$R = \sqrt{F_1^{2} + F_2^{2}}$</span>
+                                </div>
+                            </div>
+
+                            <div class="border-2 border-rose-200 rounded-2xl p-3 bg-rose-50 flex flex-col items-center">
+                                <p class="text-sm font-extrabold text-rose-700 uppercase tracking-widest">180°</p>
+                                <p class="text-xs text-slate-600 text-center mb-2">Sentidos opuestos</p>
+                                <div class="bg-slate-900 rounded-xl w-full h-28 flex items-center justify-center p-2 mb-2">
+                                    <svg viewBox="0 0 180 110" class="w-full h-full">
+                                        <defs>
+                                            <marker id="ahR" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#fb7185"/></marker>
+                                            <marker id="ahRR" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" refX="7.5" refY="5" orient="auto"><polygon points="0 0, 10 5, 0 10" fill="#fda4af"/></marker>
+                                        </defs>
+                                        <line x1="95" y1="28" x2="160" y2="28" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahR)" class="vec-arrow"/>
+                                        <text x="124" y="20" font-size="13" font-weight="bold" fill="#fda4af">F₁</text>
+                                        <line x1="95" y1="54" x2="18" y2="54" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahR)" class="vec-arrow"/>
+                                        <text x="52" y="46" font-size="13" font-weight="bold" fill="#fda4af">F₂</text>
+                                        <line x1="95" y1="88" x2="60" y2="88" stroke="#fda4af" stroke-width="4.5" marker-end="url(#ahRR)" class="vec-arrow"/>
+                                        <text x="78" y="106" font-size="13" font-weight="900" fill="#fecdd3" text-anchor="middle">R</text>
+                                    </svg>
+                                </div>
+                                <div class="bg-white px-3 py-1 rounded-lg border border-rose-300">
+                                    <span class="text-sm font-mono font-extrabold text-rose-700">$R = |F_1 - F_2|$</span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <p class="text-xs text-slate-500 text-center mt-2 italic">El sentido de la resultante coincide con el de la fuerza de mayor módulo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: Caja Arrastrada por Dos Cuerdas</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Sobre una caja en reposo actúan dos cuerdas: una jala con <strong class="text-blue-700">$F_1 = 30\text{ N}$</strong> hacia la derecha y la otra con <strong class="text-indigo-700">$F_2 = 40\text{ N}$</strong> perpendicular a la primera, hacia arriba. Determina el <strong>módulo</strong> de la fuerza resultante $\vec{R}$ que actúa sobre la caja.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[22rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1-datos', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Extraer Datos
+                        </button>
+                        <div id="paso1-datos" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <ul class="space-y-2 text-lg font-mono text-slate-700">
+                                <li><span class="font-bold text-slate-400">Fuerza 1:</span> $F_1 = 30\text{ N}$ (horizontal)</li>
+                                <li><span class="font-bold text-slate-400">Fuerza 2:</span> $F_2 = 40\text{ N}$ (vertical)</li>
+                                <li><span class="font-bold text-slate-400">Ángulo entre ambas:</span> $90°$</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2-ecs', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Elegir Ecuación
+                        </button>
+                        <div id="paso2-ecs" class="hidden fade-in bg-white border-2 border-blue-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mb-2">Caso 90° → Teorema de Pitágoras</p>
+                            <p class="text-2xl font-mono text-slate-800 text-center">$$ R = \sqrt{F_1^{2} + F_2^{2}} $$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3-res', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Resolver
+                        </button>
+                        <div id="paso3-res" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <div class="text-lg font-mono text-slate-800 mb-2">
+                                $R = \sqrt{(30)^{2} + (40)^{2}}$<br>
+                                $R = \sqrt{900 + 1600} = \sqrt{2500}$
+                            </div>
+                            <p class="text-2xl font-mono text-emerald-700 font-extrabold text-center">$\mathbf{R = 50\text{ N}}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 300 250" class="w-full h-full" style="max-height:430px">
+                        <defs>
+                            <marker id="ahBlue2" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#60a5fa"/></marker>
+                            <marker id="ahInd2" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#a78bfa"/></marker>
+                            <marker id="ahEm2" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                        </defs>
+
+                        <!-- Relleno tenue del rectángulo de fuerzas -->
+                        <polygon points="90,205 180,205 180,85 90,85" fill="#34d399" opacity="0.10"/>
+
+                        <!-- Caja -->
+                        <rect x="40" y="185" width="50" height="40" fill="#475569" stroke="#cbd5e1" stroke-width="2" rx="4"/>
+                        <text x="65" y="209" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">caja</text>
+
+                        <!-- Líneas guía del paralelogramo -->
+                        <line x1="180" y1="205" x2="180" y2="85" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,4" opacity="0.45"/>
+                        <line x1="90" y1="85" x2="180" y2="85" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="5,4" opacity="0.45"/>
+
+                        <!-- F1 horizontal -->
+                        <line x1="90" y1="205" x2="180" y2="205" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahBlue2)" class="vec-arrow"/>
+                        <text x="135" y="228" font-size="15" font-weight="bold" fill="#93c5fd" text-anchor="middle">F₁ = 30 N</text>
+
+                        <!-- F2 vertical -->
+                        <line x1="90" y1="205" x2="90" y2="85" stroke="#a78bfa" stroke-width="4.5" marker-end="url(#ahInd2)" class="vec-arrow"/>
+                        <text x="48" y="140" font-size="15" font-weight="bold" fill="#c4b5fd" text-anchor="middle">F₂=40N</text>
+
+                        <!-- Resultante -->
+                        <line x1="90" y1="205" x2="180" y2="85" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahEm2)" class="vec-arrow pulse-vec"/>
+                        <text x="225" y="118" font-size="17" font-weight="900" fill="#6ee7b7" text-anchor="middle">R = 50 N</text>
+
+                        <!-- Ángulo recto -->
+                        <path d="M 112 205 A 22 22 0 0 0 90 183" fill="none" stroke="#e2e8f0" stroke-width="2.5"/>
+                        <text x="116" y="192" font-size="12" fill="#f1f5f9" font-weight="bold">90°</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                Desarrolla en tu cuaderno aplicando el método: <strong>Datos → Esquema vectorial → Ecuación → Resolución</strong>. El color del borde indica la exigencia cognitiva (verde, ámbar, rosa).
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Dos personas empujan un mueble en la <strong>misma dirección y sentido</strong>. Una aplica $F_1 = 80\text{ N}$ y la otra $F_2 = 120\text{ N}$. Calcula el módulo de la fuerza resultante.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre una soga tiran dos equipos en <strong>sentidos opuestos</strong>: el rojo con $F_R = 350\text{ N}$ y el azul con $F_A = 410\text{ N}$. ¿Cuál es el módulo y el sentido de la fuerza neta?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un bloque recibe dos fuerzas <strong>perpendiculares</strong>: $F_x = 9\text{ N}$ y $F_y = 12\text{ N}$. Determina el módulo de la fuerza resultante.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre una caja actúan <strong>tres fuerzas colineales</strong>: $F_1 = 25\text{ N}$ a la derecha, $F_2 = 40\text{ N}$ a la derecha y $F_3 = 50\text{ N}$ a la izquierda. Determina la fuerza neta indicando módulo y sentido.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">La fuerza resultante de dos fuerzas perpendiculares es de $25\text{ N}$. Si una de ellas mide $15\text{ N}$, ¿cuál es el módulo de la otra? (<em>Despeje</em>)</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Dos fuerzas iguales de $F\text{ N}$ cada una, perpendiculares entre sí, generan una resultante de $10\sqrt{2}\text{ N}$. Determina el valor de $F$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> dos fuerzas $F_1$ y $F_2$ actúan sobre un mismo punto. Justifica qué ángulo entre ellas hace <strong>máxima</strong> la resultante y cuál la hace <strong>mínima</strong>.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Ingeniería inversa:</strong> sobre un cuerpo actúan dos fuerzas perpendiculares cuya razón es $F_1 : F_2 = 3 : 4$. Si la resultante mide $100\text{ N}$, determina ambos módulos por separado.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Sobre un bloque en reposo actúan simultáneamente dos fuerzas perpendiculares entre sí: una horizontal de $6\text{ N}$ y una vertical de $8\text{ N}$.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            ¿Cuál de las siguientes afirmaciones es <strong>estrictamente verdadera</strong> respecto de la fuerza resultante sobre el bloque?
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) Su módulo es exactamente $14\text{ N}$, suma de ambas fuerzas.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">B) Su módulo es $2\text{ N}$, equivalente a la diferencia de ambas.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">C) Su módulo es $10\text{ N}$ y su dirección queda determinada por la diagonal del rectángulo formado.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) No puede calcularse sin conocer la masa del bloque.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">A) Falsa:</span> sumar directamente $6 + 8 = 14\text{ N}$ sólo aplica si las fuerzas son colineales y del mismo sentido (ángulo $0°$).
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">B) Falsa:</span> $|8 - 6| = 2\text{ N}$ corresponde al caso $180°$, no al perpendicular.
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">C) Correcta:</span> al ser perpendiculares, aplicamos Pitágoras:
+                                $$ R = \sqrt{6^{2} + 8^{2}} = \sqrt{36 + 64} = \sqrt{100} = \mathbf{10\text{ N}} $$
+                                La resultante es la diagonal del rectángulo formado por ambas fuerzas.
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">D) Falsa:</span> la composición vectorial sólo depende de las fuerzas, no de la masa.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 8: Concepto de Fuerza y Vectores</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1-datos') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2-ecs') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>
