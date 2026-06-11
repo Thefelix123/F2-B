@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C14 — Fuerza de Roce</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                macros: { sen: "\\sin" }
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        #main-container {
+            width: 100vw;
+            height: calc(100vh - 6rem);
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            height: 100%;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 8rem;
+        }
+
+        .slide.active {
+            display: flex;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border-radius: 1.5rem;
+        }
+
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #818cf8; border-radius: 8px; border: 3px solid #f1f5f9; }
+        ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+        .scrollable-content::-webkit-scrollbar { width: 10px; }
+
+        .fade-in { opacity: 0; transition: opacity 0.6s ease-in-out; pointer-events: none; }
+        .visible { opacity: 1 !important; pointer-events: auto !important; }
+
+        .vec-arrow { stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+
+<body class="text-slate-800 select-none">
+
+    <div class="h-4 w-full bg-indigo-800 shrink-0 z-50 relative"></div>
+
+    <div id="main-container">
+
+        <!-- ============ DIAPOSITIVA 1: PORTADA ============ -->
+        <div class="slide active p-10 bg-slate-50">
+            <div class="flex-1 flex flex-col items-center justify-center space-y-8 w-full h-full relative overflow-hidden">
+                <div class="absolute inset-0 opacity-[0.04] z-0 flex items-center justify-center pointer-events-none">
+                    <i data-lucide="grip-horizontal" class="w-[800px] h-[800px] text-indigo-900"></i>
+                </div>
+                <div class="relative w-40 h-40 flex items-center justify-center z-10">
+                    <i data-lucide="move-horizontal" class="w-full h-full text-indigo-800 opacity-90 absolute"></i>
+                </div>
+                <h1 class="text-7xl font-extrabold tracking-tight text-slate-900 uppercase text-center leading-tight z-10">
+                    Fuerza de Roce
+                </h1>
+                <p class="text-4xl text-slate-500 font-semibold tracking-wide text-center z-10">
+                    La fuerza que se opone al deslizamiento
+                </p>
+                <div class="mt-16 p-8 glass-card border-l-8 border-indigo-800 text-left w-full max-w-5xl flex justify-between items-end z-10 shadow-lg">
+                    <p class="text-4xl font-bold text-slate-900">Prof. Luis Quezada</p>
+                    <p class="text-3xl font-bold text-indigo-800 uppercase tracking-wider">SEK CHILE • F2 • C14</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 2: INTRODUCCIÓN ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="zap" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">¿Por qué se Detiene lo que Desliza?</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-10 flex-1 items-stretch">
+                <div class="col-span-5 flex flex-col justify-center">
+                    <div class="space-y-6">
+                        <p class="text-xl text-slate-700 leading-relaxed font-medium">
+                            Empujas un libro sobre la mesa, lo sueltas y se detiene solo. Según la inercia, debería seguir moviéndose. ¿Qué lo frena?
+                        </p>
+                        <div class="glass-card p-6 border-l-8 border-indigo-500 shadow-sm">
+                            <p class="text-xl text-slate-800 font-bold mb-2">El roce entre superficies</p>
+                            <p class="text-lg text-slate-700 leading-relaxed font-medium">
+                                Las superficies nunca son perfectamente lisas. Sus irregularidades se traban y producen una fuerza que <strong>se opone al movimiento</strong>: la fuerza de roce.
+                            </p>
+                        </div>
+                        <div class="bg-amber-50 border-l-8 border-amber-500 p-5 rounded-r-xl">
+                            <p class="text-lg text-slate-800 font-medium leading-relaxed">
+                                <strong class="text-amber-700">Dato curioso:</strong> cuesta más <em>iniciar</em> el movimiento de un mueble que <em>mantenerlo</em> en movimiento. El roce no siempre vale lo mismo.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-7 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 420 280" class="w-full h-full" style="max-height:460px">
+                        <defs>
+                            <marker id="ahV" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#34d399"/></marker>
+                            <marker id="ahFr" markerUnits="userSpaceOnUse" markerWidth="13" markerHeight="13" refX="9.5" refY="6.5" orient="auto"><polygon points="0 0, 13 6.5, 0 13" fill="#fb7185"/></marker>
+                        </defs>
+
+                        <!-- Superficie rugosa -->
+                        <line x1="20" y1="190" x2="400" y2="190" stroke="#94a3b8" stroke-width="2.5"/>
+                        <path d="M 20 190 L 30 182 L 40 190 L 50 182 L 60 190 L 70 182 L 80 190 L 90 182 L 100 190 L 110 182 L 120 190 L 130 182 L 140 190 L 150 182 L 160 190 L 170 182 L 180 190 L 190 182 L 200 190 L 210 182 L 220 190 L 230 182 L 240 190 L 250 182 L 260 190 L 270 182 L 280 190 L 290 182 L 300 190 L 310 182 L 320 190 L 330 182 L 340 190 L 350 182 L 360 190 L 370 182 L 380 190 L 390 182 L 400 190" fill="none" stroke="#64748b" stroke-width="2"/>
+                        <text x="350" y="210" font-size="12" fill="#94a3b8" font-style="italic">superficie rugosa</text>
+
+                        <!-- Libro deslizando -->
+                        <rect x="150" y="140" width="90" height="50" rx="4" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="195" y="170" font-size="14" fill="#fff" font-weight="bold" text-anchor="middle">libro</text>
+
+                        <!-- Velocidad (derecha) -->
+                        <line x1="245" y1="120" x2="320" y2="120" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahV)" class="vec-arrow"/>
+                        <text x="282" y="110" font-size="15" fill="#6ee7b7" font-weight="bold" text-anchor="middle">v (movimiento)</text>
+
+                        <!-- Roce (izquierda) -->
+                        <line x1="150" y1="165" x2="80" y2="165" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahFr)" class="vec-arrow"/>
+                        <text x="95" y="155" font-size="15" fill="#fda4af" font-weight="bold" text-anchor="middle">Fr (roce)</text>
+
+                        <text x="210" y="250" font-size="14" fill="#cbd5e1" text-anchor="middle">El roce apunta SIEMPRE en contra del movimiento.</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 3: DEFINICIÓN ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="book-open" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Formalización: $F_r = \mu \cdot N$</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="glass-card p-6 flex flex-col justify-center items-center border-t-[10px] border-indigo-600 shadow-lg bg-white">
+                        <p class="text-base text-slate-800 leading-relaxed font-medium text-center max-w-3xl mb-3">
+                            La fuerza de roce es proporcional a la fuerza <strong>normal</strong> que aprieta las superficies. El factor de proporción es el <strong>coeficiente de roce</strong> $\mu$ (adimensional).
+                        </p>
+                        <div class="bg-indigo-50 px-8 py-3 rounded-2xl text-3xl text-center text-indigo-800 font-black border border-indigo-200 shadow-inner">
+                            $$ F_r = \mu \cdot N $$
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass-card p-5 border-l-8 border-amber-500 shadow-md bg-white">
+                            <p class="text-lg font-extrabold text-slate-900 mb-1">Roce estático ($\mu_s$)</p>
+                            <p class="text-sm text-slate-700 leading-relaxed font-medium">Actúa cuando el cuerpo aún <strong>no se mueve</strong>. Crece según la fuerza aplicada hasta un máximo $F_{s} = \mu_s N$.</p>
+                        </div>
+                        <div class="glass-card p-5 border-l-8 border-emerald-500 shadow-md bg-white">
+                            <p class="text-lg font-extrabold text-slate-900 mb-1">Roce cinético ($\mu_k$)</p>
+                            <p class="text-sm text-slate-700 leading-relaxed font-medium">Actúa cuando el cuerpo ya <strong>desliza</strong>. Es aproximadamente constante: $F_k = \mu_k N$.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-100 border-2 border-slate-300 rounded-2xl p-4">
+                        <p class="text-sm font-bold text-slate-800 mb-2 uppercase tracking-widest">Coeficientes cinéticos típicos ($\mu_k$)</p>
+                        <div class="grid grid-cols-4 gap-2 text-center text-sm">
+                            <div class="bg-white rounded-lg p-2 border border-slate-200"><p class="font-bold text-slate-700">Hielo–hielo</p><p class="font-mono text-indigo-700">0,05</p></div>
+                            <div class="bg-white rounded-lg p-2 border border-slate-200"><p class="font-bold text-slate-700">Madera</p><p class="font-mono text-indigo-700">0,30</p></div>
+                            <div class="bg-white rounded-lg p-2 border border-slate-200"><p class="font-bold text-slate-700">Acero</p><p class="font-mono text-indigo-700">0,60</p></div>
+                            <div class="bg-white rounded-lg p-2 border border-slate-200"><p class="font-bold text-slate-700">Goma–asfalto</p><p class="font-mono text-indigo-700">0,80</p></div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-2 text-center italic">Por lo general $\mu_s > \mu_k$: cuesta más arrancar que mantener el movimiento.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card p-4 border-4 border-slate-200 shadow-md bg-white flex flex-col">
+                    <p class="text-base text-slate-800 font-bold mb-2 text-center">Las cuatro fuerzas sobre el cuerpo</p>
+                    <div class="flex-1 bg-slate-900 rounded-2xl p-3 flex items-center justify-center min-h-[300px]">
+                        <svg viewBox="0 0 300 300" class="w-full h-full" style="max-height:330px">
+                            <defs>
+                                <marker id="ahN3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#60a5fa"/></marker>
+                                <marker id="ahP3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fb7185"/></marker>
+                                <marker id="ahF3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                                <marker id="ahFr3" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                                <pattern id="hatch14" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
+                                    <line x1="0" y1="0" x2="0" y2="10" stroke="#475569" stroke-width="2"/>
+                                </pattern>
+                            </defs>
+
+                            <line x1="20" y1="195" x2="280" y2="195" stroke="#94a3b8" stroke-width="2.5"/>
+                            <rect x="20" y="195" width="260" height="13" fill="url(#hatch14)" opacity="0.7"/>
+
+                            <rect x="115" y="155" width="70" height="40" rx="4" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+
+                            <!-- Normal arriba -->
+                            <line x1="150" y1="155" x2="150" y2="65" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahN3)" class="vec-arrow"/>
+                            <text x="160" y="100" font-size="16" fill="#93c5fd" font-weight="900">N</text>
+
+                            <!-- Peso abajo -->
+                            <line x1="150" y1="195" x2="150" y2="275" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahP3)" class="vec-arrow"/>
+                            <text x="160" y="245" font-size="16" fill="#fda4af" font-weight="900">P</text>
+
+                            <!-- Fuerza aplicada derecha -->
+                            <line x1="185" y1="175" x2="265" y2="175" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahF3)" class="vec-arrow"/>
+                            <text x="225" y="167" font-size="15" fill="#6ee7b7" font-weight="900" text-anchor="middle">F</text>
+
+                            <!-- Roce izquierda -->
+                            <line x1="115" y1="175" x2="45" y2="175" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahFr3)" class="vec-arrow"/>
+                            <text x="78" y="167" font-size="15" fill="#fde68a" font-weight="900" text-anchor="middle">Fr</text>
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 4: EJEMPLO ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pencil-ruler" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Modelaje: Caja que Empieza a Deslizar</h2>
+            </div>
+
+            <div class="glass-card p-6 border-l-8 border-slate-800 shadow-sm mb-6 bg-slate-50">
+                <p class="text-2xl text-slate-800 font-medium leading-relaxed">
+                    Una caja de <strong class="text-indigo-700">$m = 10\text{ kg}$</strong> se desliza sobre un piso horizontal con coeficiente de roce cinético <strong class="text-amber-700">$\mu_k = 0{,}3$</strong>. Se la empuja con una fuerza horizontal de <strong class="text-emerald-700">$F = 50\text{ N}$</strong>. Usa $g = 10\text{ m/s}^2$.
+                    <br><br>
+                    Determina la <strong>fuerza de roce</strong> y la <strong>aceleración</strong> de la caja.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6 flex-1 min-h-[20rem]">
+
+                <div class="col-span-7 flex flex-col gap-4">
+                    <div class="flex flex-col gap-3">
+                        <button onclick="revelarPaso('paso1', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-700 rounded-xl text-xl font-bold hover:bg-slate-300 transition shadow-sm border-2 border-slate-300 flex items-center justify-center gap-2">
+                            <i data-lucide="list-checks"></i> 1. Hallar la normal
+                        </button>
+                        <div id="paso1" class="hidden fade-in bg-white border-2 border-slate-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-base text-slate-700 font-medium mb-1">En plano horizontal sin fuerzas verticales extra:</p>
+                            <p class="text-xl font-mono text-slate-800 text-center mb-1">$N = mg = 10 \cdot 10$</p>
+                            <p class="text-2xl font-mono text-blue-700 font-black text-center">$\mathbf{N = 100\text{ N}}$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso2" onclick="revelarPaso('paso2', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="target"></i> 2. Calcular el roce
+                        </button>
+                        <div id="paso2" class="hidden fade-in bg-white border-2 border-amber-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-xl font-mono text-slate-800 text-center mb-1">$F_r = \mu_k \cdot N = 0{,}3 \cdot 100$</p>
+                            <p class="text-2xl font-mono text-amber-700 font-black text-center">$\mathbf{F_r = 30\text{ N}}$</p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3">
+                        <button id="btn-paso3" onclick="revelarPaso('paso3', this)"
+                            class="w-full py-4 bg-slate-200 text-slate-400 rounded-xl text-xl font-bold transition border-2 border-slate-200 cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                            <i data-lucide="check-square"></i> 3. Aplicar 2ª Ley
+                        </button>
+                        <div id="paso3" class="hidden fade-in bg-emerald-50 border-2 border-emerald-200 p-5 rounded-xl shadow-inner">
+                            <p class="text-lg font-mono text-slate-800 text-center mb-1">$F_{neta} = F - F_r = 50 - 30 = 20\text{ N}$</p>
+                            <p class="text-lg font-mono text-slate-800 text-center mb-1">$a = \dfrac{F_{neta}}{m} = \dfrac{20}{10}$</p>
+                            <p class="text-2xl font-mono text-emerald-700 font-black text-center">$\mathbf{a = 2\text{ m/s}^2}$</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 glass-card border-4 border-slate-200 shadow-xl bg-slate-900 flex items-center justify-center p-4">
+                    <svg viewBox="0 0 300 300" class="w-full h-full" style="max-height:430px">
+                        <defs>
+                            <marker id="ahN4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#60a5fa"/></marker>
+                            <marker id="ahP4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fb7185"/></marker>
+                            <marker id="ahF4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#34d399"/></marker>
+                            <marker id="ahFr4" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" refX="9" refY="6" orient="auto"><polygon points="0 0, 12 6, 0 12" fill="#fbbf24"/></marker>
+                            <pattern id="hatch14b" patternUnits="userSpaceOnUse" width="10" height="10" patternTransform="rotate(45)">
+                                <line x1="0" y1="0" x2="0" y2="10" stroke="#475569" stroke-width="2"/>
+                            </pattern>
+                        </defs>
+
+                        <line x1="20" y1="200" x2="280" y2="200" stroke="#94a3b8" stroke-width="2.5"/>
+                        <rect x="20" y="200" width="260" height="13" fill="url(#hatch14b)" opacity="0.7"/>
+
+                        <rect x="115" y="160" width="70" height="40" rx="4" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+                        <text x="150" y="185" font-size="13" fill="#fff" font-weight="bold" text-anchor="middle">10 kg</text>
+
+                        <!-- Normal (100 N) -->
+                        <line x1="150" y1="160" x2="150" y2="70" stroke="#60a5fa" stroke-width="4.5" marker-end="url(#ahN4)" class="vec-arrow"/>
+                        <text x="158" y="105" font-size="14" fill="#93c5fd" font-weight="900">N=100</text>
+
+                        <!-- Peso (100 N) -->
+                        <line x1="150" y1="200" x2="150" y2="285" stroke="#fb7185" stroke-width="4.5" marker-end="url(#ahP4)" class="vec-arrow"/>
+                        <text x="158" y="255" font-size="14" fill="#fda4af" font-weight="900">P=100</text>
+
+                        <!-- Empuje F (50 N → 50 px) -->
+                        <line x1="185" y1="178" x2="235" y2="178" stroke="#34d399" stroke-width="4.5" marker-end="url(#ahF4)" class="vec-arrow"/>
+                        <text x="212" y="170" font-size="13" fill="#6ee7b7" font-weight="900" text-anchor="middle">F=50</text>
+
+                        <!-- Roce Fr (30 N → 30 px) -->
+                        <line x1="115" y1="178" x2="85" y2="178" stroke="#fbbf24" stroke-width="4.5" marker-end="url(#ahFr4)" class="vec-arrow"/>
+                        <text x="78" y="170" font-size="13" fill="#fde68a" font-weight="900" text-anchor="middle">Fr=30</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 5: PROBLEMAS ============ -->
+        <div class="slide p-10 bg-slate-50">
+            <div class="flex items-center gap-6 mb-8 border-b-4 border-slate-200 pb-4 shrink-0">
+                <i data-lucide="pen-tool" class="w-14 h-14 text-indigo-800"></i>
+                <h2 class="text-5xl font-bold text-slate-900">Práctica Analítica Independiente</h2>
+            </div>
+
+            <p class="text-lg text-slate-600 border-l-8 border-indigo-500 pl-4 bg-white py-3 font-medium rounded-r-xl shadow-sm shrink-0 mb-6">
+                En plano horizontal, recuerda que $N = mg$ y $F_r = \mu N$. Usa $g = 10\text{ m/s}^2$ y combina con la 2ª Ley cuando se pida la aceleración.
+            </p>
+
+            <div class="grid grid-cols-2 gap-5 flex-1">
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">1</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Sobre un cuerpo la normal es $N = 200\text{ N}$ y el coeficiente de roce $\mu = 0{,}4$. Calcula la fuerza de roce.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">2</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una caja de $8\text{ kg}$ se desliza por el suelo con $\mu_k = 0{,}25$. Determina la fuerza de roce cinético sobre ella.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-emerald-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-emerald-100 text-emerald-700 rounded-full font-bold text-xl shrink-0">3</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">La fuerza de roce sobre un bloque es $30\text{ N}$ y la normal es $120\text{ N}$. ¿Cuál es el coeficiente de roce?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">4</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una caja de $5\text{ kg}$ ($\mu_k = 0{,}2$) es empujada horizontalmente con $20\text{ N}$. Calcula el roce y la aceleración resultante.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">5</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Un bloque de $4\text{ kg}$ se mueve con velocidad constante al ser empujado horizontalmente. Si $\mu_k = 0{,}5$, ¿qué fuerza se le aplica? (Pista: equilibrio)</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-amber-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-full font-bold text-xl shrink-0">6</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed">Una caja de $6\text{ kg}$ está en reposo con $\mu_s = 0{,}4$. ¿Cuál es la fuerza mínima horizontal para que empiece a moverse?</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">7</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Análisis cualitativo:</strong> si una caja se empuja hacia abajo y hacia adelante a la vez, ¿aumenta o disminuye el roce? Justifica relacionando $N$ con $F_r = \mu N$.</p>
+                </div>
+
+                <div class="bg-white p-5 rounded-2xl border-t-8 border-rose-500 shadow-md flex gap-4">
+                    <span class="w-10 h-10 flex items-center justify-center bg-rose-100 text-rose-700 rounded-full font-bold text-xl shrink-0">8</span>
+                    <p class="text-slate-700 font-medium text-lg leading-relaxed"><strong>Ingeniería inversa:</strong> una caja de $10\text{ kg}$ empujada con $60\text{ N}$ adquiere una aceleración de $2\text{ m/s}^2$. Determina la fuerza de roce y el coeficiente $\mu_k$.</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============ DIAPOSITIVA 6: TICKET DE SALIDA ============ -->
+        <div class="slide bg-white p-10">
+            <div class="flex items-center mb-8 border-b-4 border-slate-200 pb-4 shrink-0 gap-6">
+                <i data-lucide="target" class="w-16 h-16 text-indigo-800"></i>
+                <h2 class="text-6xl font-bold text-slate-900">Evaluación de Síntesis PAES</h2>
+            </div>
+
+            <div class="grid grid-cols-12 gap-12 flex-1 items-start relative h-full">
+
+                <div class="col-span-6 flex flex-col space-y-6 h-full justify-start">
+                    <div class="p-8 bg-slate-50 border-2 border-slate-200 rounded-3xl shadow-sm flex flex-col">
+                        <p class="text-2xl font-medium text-slate-800 leading-relaxed text-justify mb-6">
+                            Una caja de $5\text{ kg}$ está en reposo sobre un piso horizontal con coeficiente de roce estático $\mu_s = 0{,}4$. Se la empuja con una fuerza horizontal de $15\text{ N}$. Usa $g = 10\text{ m/s}^2$.
+                        </p>
+                        <p class="text-2xl font-extrabold text-slate-900 leading-relaxed">
+                            ¿Qué ocurre con la caja y cuánto vale la fuerza de roce?
+                        </p>
+                    </div>
+
+                    <div class="space-y-3 text-xl font-bold text-slate-700 flex-1 flex flex-col justify-end">
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">A) Se mueve, y el roce vale $20\text{ N}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white" id="correct-opt-paes">B) No se mueve, y el roce vale $15\text{ N}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">C) No se mueve, y el roce vale $20\text{ N}$.</p>
+                        <p class="p-4 rounded-2xl border-2 border-slate-200 shadow-sm bg-white">D) Se mueve, y el roce vale $15\text{ N}$.</p>
+                    </div>
+                </div>
+
+                <div class="col-span-6 relative w-full h-full flex flex-col justify-center min-h-[24rem]">
+
+                    <button id="btn-reveal-paes" onclick="revelarSolucionPAES()"
+                        class="absolute inset-0 m-auto h-max px-8 py-8 bg-indigo-900 text-white rounded-3xl text-3xl font-extrabold hover:bg-indigo-800 transition-all shadow-xl flex items-center justify-center gap-4 hover:scale-105 active:scale-95 border-4 border-indigo-200 z-20">
+                        <i data-lucide="shield-check" class="w-12 h-12"></i> Ejecutar Verificación Lógica
+                    </button>
+
+                    <div id="respuesta-paes" class="hidden fade-in absolute inset-0 w-full h-full bg-white p-8 rounded-3xl border-4 border-emerald-500 flex-col justify-center text-left shadow-2xl z-10 overflow-y-auto">
+                        <p class="text-emerald-700 text-3xl font-extrabold border-b-4 border-emerald-100 pb-4 mb-6 shrink-0 uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="check-circle" class="w-10 h-10"></i> Deducción Correcta
+                        </p>
+                        <div class="text-xl text-slate-800 space-y-4 font-medium tracking-wide">
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">Roce estático máximo:</span>
+                                $$ F_{s,\max} = \mu_s \cdot N = 0{,}4 \cdot (5 \cdot 10) = 20\text{ N} $$
+                            </div>
+                            <div class="bg-indigo-50 p-4 border-l-8 border-indigo-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-indigo-800 block mb-1">B) Correcta:</span> como la fuerza aplicada ($15\text{ N}$) es <strong>menor</strong> que el máximo ($20\text{ N}$), la caja no se mueve. El roce estático <strong>se ajusta</strong> para equilibrar exactamente lo aplicado:
+                                $$ F_r = 15\text{ N} $$
+                            </div>
+                            <div class="bg-slate-50 p-4 border-l-8 border-slate-400 rounded-r-xl shadow-inner">
+                                <span class="font-bold text-slate-800 block mb-1">Error común:</span> creer que el roce siempre vale $\mu N$. El valor $\mu_s N = 20\text{ N}$ es solo el <strong>máximo</strong>; mientras no se alcance, el roce iguala a la fuerza aplicada.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="h-24 w-full shrink-0 flex justify-between items-center px-12 bg-white border-t-2 border-slate-200 fixed bottom-0 z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <div class="text-slate-400 font-extrabold text-2xl tracking-widest uppercase truncate max-w-[60%] flex gap-4 items-center">
+            <span class="text-indigo-800">F2</span>
+            <span class="text-slate-300">|</span>
+            <span>Clase 14: Fuerza de Roce</span>
+        </div>
+        <div class="flex gap-6">
+            <button onclick="changeSlide(-1)" class="p-5 rounded-full bg-slate-50 border-2 border-slate-200 shadow-sm hover:bg-slate-200 hover:border-slate-300 transition-all cursor-pointer focus:outline-none text-slate-600">
+                <i data-lucide="chevron-left" class="w-10 h-10"></i>
+            </button>
+            <button onclick="changeSlide(1)" class="p-5 rounded-full bg-indigo-900 text-white shadow-md hover:bg-indigo-800 hover:shadow-lg transition-all cursor-pointer focus:outline-none transform hover:scale-105 active:scale-95 border-2 border-indigo-900">
+                <i data-lucide="chevron-right" class="w-10 h-10"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+
+        function updateSlide() {
+            slides.forEach((s, i) => {
+                s.classList.remove('active');
+                if (i === currentSlide) {
+                    s.classList.add('active');
+                    s.scrollTop = 0;
+                }
+            });
+        }
+
+        function changeSlide(d) {
+            const n = currentSlide + d;
+            if (n >= 0 && n < slides.length) {
+                currentSlide = n;
+                updateSlide();
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (['Space', 'Enter'].includes(e.code) && document.activeElement.tagName !== 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        function revelarPaso(idDestino, botonActual) {
+            const destino = document.getElementById(idDestino);
+
+            botonActual.classList.remove('bg-slate-200', 'text-slate-700', 'text-slate-400', 'border-slate-300', 'border-slate-200', 'hover:bg-slate-300');
+            botonActual.classList.add('bg-slate-800', 'text-white', 'border-slate-900', 'shadow-md');
+
+            destino.classList.remove('hidden');
+            destino.classList.add('block', 'visible');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([destino]).catch(e => console.log(e)); } catch (e) {}
+            }
+
+            if (idDestino === 'paso1') {
+                const btn2 = document.getElementById('btn-paso2');
+                btn2.disabled = false;
+                btn2.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn2.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            } else if (idDestino === 'paso2') {
+                const btn3 = document.getElementById('btn-paso3');
+                btn3.disabled = false;
+                btn3.classList.remove('text-slate-400', 'cursor-not-allowed', 'border-slate-200');
+                btn3.classList.add('text-slate-700', 'border-slate-300', 'hover:bg-slate-300', 'cursor-pointer');
+            }
+        }
+
+        function revelarSolucionPAES() {
+            const btn = document.getElementById('btn-reveal-paes');
+            const target = document.getElementById('respuesta-paes');
+
+            btn.style.display = 'none';
+
+            setTimeout(() => {
+                target.classList.remove('hidden');
+                target.classList.add('flex', 'visible');
+            }, 50);
+
+            const correctOpt = document.getElementById('correct-opt-paes');
+            correctOpt.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900', 'shadow-md');
+            correctOpt.classList.remove('border-slate-200', 'bg-white');
+
+            if (window.MathJax) {
+                try { MathJax.typesetPromise([target]).catch(e => console.log(e)); } catch (e) {}
+            }
+        }
+    </script>
+</body>
+
+</html>
